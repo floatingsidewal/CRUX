@@ -1,0 +1,21 @@
+{
+  "name": "CRUX Development",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/azure-cli:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-vscode.vscode-json",
+        "ms-vscode.azure-account",
+        "ms-azuretools.vscode-bicep"
+      ]
+    }
+  },
+  "postCreateCommand": "pip install -r requirements.txt",
+  "remoteUser": "vscode"
+}
