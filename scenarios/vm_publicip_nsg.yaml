@@ -1,0 +1,20 @@
+name: vm-publicip-nsg
+location: eastus
+resources:
+  - type: Microsoft.Network/networkSecurityGroups
+    alias: nsg1
+    params:
+      rules:
+        - name: AllowHttp
+          priority: 100
+          direction: Inbound
+          access: Allow
+          protocol: Tcp
+          sourcePortRange: "*"
+          destinationPortRange: "80"
+          sourceAddressPrefix: "*"
+          destinationAddressPrefix: "*"
+  # Placeholder: add VM + NIC + Public IP modules in a future iteration
+relations:
+  - link: nsg1 -> vm1
+

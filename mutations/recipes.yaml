@@ -1,0 +1,37 @@
+mutations:
+  - id: st_public_access
+    target: Microsoft.Storage/storageAccounts
+    set:
+      properties.allowBlobPublicAccess: true
+    labels: [Storage_PublicAccess]
+
+  - id: st_firewall_open
+    target: Microsoft.Storage/storageAccounts
+    set:
+      properties.networkAcls.defaultAction: Allow
+    labels: [Storage_FirewallOpen]
+
+  - id: kv_no_purge_protection
+    target: Microsoft.KeyVault/vaults
+    set:
+      properties.enablePurgeProtection: false
+    labels: [KeyVault_NoPurgeProtection]
+
+  - id: nsg_open_ssh
+    target: Microsoft.Network/networkSecurityGroups
+    action: nsg_rule_update
+    args:
+      name: "AllowSSH"
+      source: "*"
+      destPorts: [22]
+      access: "Allow"
+    labels: [NSG_OpenInbound]
+
+  - id: func_plaintext_secret
+    target: Microsoft.Web/sites
+    action: appsettings_put
+    args:
+      name: "ConnString"
+      value: "DefaultEndpointsProtocol=http;AccountName=example;AccountKey=...;"
+    labels: [FuncApp_SecretsInAppSettings]
+

@@ -1,0 +1,15 @@
+budget:
+  regions: [eastus, westus2]
+  maxVMs: 1
+  skuBlacklist: [Premium_*]
+
+forbiddenCombos:
+  - [st_firewall_open, st_public_access]
+
+timeouts:
+  rgTTLMinutes: 60
+
+tags:
+  crux: true
+  env: crux-playground
+
