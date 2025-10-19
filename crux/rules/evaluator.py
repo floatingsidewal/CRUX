@@ -214,6 +214,19 @@ class RuleEvaluator:
 
         return unique_labels
 
+    def evaluate(self, resource: Dict[str, Any]) -> List[str]:
+        """
+        Convenience method to evaluate all rules against a resource.
+        Alias for evaluate_all_rules().
+
+        Args:
+            resource: Resource dictionary
+
+        Returns:
+            List of labels from matching rules
+        """
+        return self.evaluate_all_rules(resource)
+
     def evaluate_resources(
         self, resources: List[Dict[str, Any]]
     ) -> Dict[str, List[str]]:
