@@ -242,7 +242,7 @@ class DatasetGenerator:
 
             # Export to GraphML
             graph_file = graphs_dir / f"{template_path.stem}.graphml"
-            self.graph_builder.export_graphml(graph, graph_file)
+            self.graph_builder.export_to_graphml(graph, graph_file)
 
             # Also export to JSON for easier inspection
             json_file = graphs_dir / f"{template_path.stem}_graph.json"
