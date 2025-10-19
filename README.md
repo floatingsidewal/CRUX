@@ -1,73 +1,174 @@
 # CRUX
 
-**CRUX** (Cloud Resource Configuration Analyzer) is a prototype system for generating labeled datasets to train ML models that detect misconfigurations in Azure deployments. CRUX composes small Bicep modules into scenarios, deploys them, harvests running configuration state, applies controlled mutations (a "configuration fuzzer"), then harvests again with ground‑truth labels.
+**CRUX** (Cloud Resource Configuration Analyzer) is a system for generating labeled datasets to train ML models that detect misconfigurations in Azure resources. CRUX analyzes Bicep/ARM templates statically, applies controlled mutations (a "configuration fuzzer"), and generates ground-truth labels based on security rules and CIS benchmarks.
 
 ## Why CRUX
-- **Deterministic labels**: Every mutation is intentional and recorded → clean ground truth.
-- **Schema‑agnostic**: Supports heterogeneous resource types (Function, Storage, Key Vault, NSG, etc.) and their relationships.
-- **Graph‑aware**: Designed to export node/edge views for cross‑resource issue detection.
+- **Zero Azure cost**: Analyzes templates locally without deploying to Azure
+- **Deterministic labels**: Every mutation is intentional and recorded → clean ground truth
+- **Large-scale dataset generation**: Process 1000+ templates in hours, not weeks
+- **Schema-agnostic**: Supports heterogeneous resource types (Storage, Key Vault, NSG, Function App, etc.)
+- **Graph-aware**: Exports dependency graphs for cross-resource issue detection
 
-## Repository Layout (initial)
+## Architecture (Option D: Static Template Analysis)
+
+CRUX uses a pipeline approach: **Fetch → Compile → Extract → Mutate → Label → Export**
+
+1. **Fetch**: Download Azure Quickstart Templates from GitHub (1000+ real-world examples)
+2. **Compile**: Convert Bicep to ARM JSON using `az bicep build`
+3. **Extract**: Parse ARM JSON to extract resource properties and dependencies
+4. **Mutate**: Apply Python-defined mutations to inject misconfigurations
+5. **Label**: Evaluate YAML-defined security rules to generate labels
+6. **Export**: Save labeled datasets (baseline + mutated) for ML training
+
+## Quick Start
+
+### Installation
+
+```bash
+# Install CRUX in development mode
+pip install -e .
+
+# Or with development dependencies
+pip install -e .[dev]
+
+# Or with ML libraries
+pip install -e .[ml]
+```
+
+### Basic Workflow
+
+```bash
+# 1. Fetch Azure Quickstart Templates (first time only)
+crux fetch-templates --limit 100 --output templates/
+
+# 2. Generate a labeled dataset
+crux generate-dataset \
+  --templates templates/azure-quickstart-templates \
+  --pattern "quickstarts/**/*.bicep" \
+  --rules rules/ \
+  --output dataset/ \
+  --name pilot-001 \
+  --limit 50
+
+# 3. Explore the results
+ls -la dataset/pilot-001/
+cat dataset/pilot-001/metadata.json
+cat dataset/pilot-001/labels.json
+
+# 4. List available mutations and rules
+crux list-mutations
+crux list-rules
+```
+
+## Repository Layout
+
 ```
 crux/
-  modules/                 # reusable Bicep modules
-  scenarios/               # YAML → Bicep compositions
-  mutations/               # fuzzer recipes + constraints
-  harness/                 # Python CLI orchestrator
-  params/                  # default parameters
-  dataset/                 # harvested outputs (git‑ignored by default)
-  .github/
-    copilot-instructions.md
-  prd.md
+  crux/                       # Main Python package
+    templates/                # Template operations (fetch, compile, extract, graph)
+    mutations/                # Python mutation definitions
+      storage.py              # Storage account mutations
+    rules/                    # Rule evaluation engine
+    dataset/                  # Dataset generation pipeline
+    cli.py                    # Command-line interface
+  rules/                      # YAML security rule definitions
+    storage.yaml              # CIS rules for storage accounts
+  templates/                  # Downloaded templates (gitignored)
+  dataset/                    # Generated datasets (gitignored)
+  tests/                      # Unit tests
+  pyproject.toml              # Package configuration
   README.md
+  CLAUDE.md
+  prd.md
 ```
 
-## Quick Start (baseline flow)
-1) Use a sandbox Azure subscription and login with `az login`.
-2) Optionally prepare a Bicep/ARM composition template (see examples in **modules/** and patterns in **prd.md**).
-3) Deploy baseline → harvest → mutate → harvest → cleanup using the CLI in `harness/crux.py`.
-
-Examples:
+## Dataset Structure
 
 ```
-# Create RG, (optionally) deploy a template, and harvest baseline
-python3 harness/crux.py deploy \
-  --rg crux-rg-$RANDOM \
-  --location eastus \
-  --template out/func_storage_kv.bicep \
-  --parameters params/func_storage_kv.json \
-  --scenario func-storage-kv
-
-# Apply a raw mutation to a specific resource and harvest again
-# (Find resource IDs in dataset/<exp>/original/resources.json)
-python3 harness/crux.py mutate-raw \
-  --rg <your-rg> \
-  --resource-id \
-  "/subscriptions/.../resourceGroups/<your-rg>/providers/Microsoft.Storage/storageAccounts/<name>" \
-  --set properties.allowBlobPublicAccess=true \
-  --out dataset/<your-exp-folder>
-
-# Cleanup the resource group
-python3 harness/crux.py cleanup --rg <your-rg>
-```
-
-## Dataset Structure (per experiment)
-```
-crux/dataset/exp-YYYYMMDD-HHMMSS/
-  metadata.json         # scenario, commit, timestamps
-  original/             # harvested baseline JSONs
+dataset/exp-YYYYMMDD-HHMMSS/
+  metadata.json               # Experiment metadata
+  baseline/
+    resources.json            # Original (unmutated) resources
   mutated/
-    <mutation-id>/      # harvested after a specific mutation
-      mutation.json     # what changed + labels
-  labels.json           # resource → [labels]
+    resources.json            # Mutated resources with labels
+  graphs/                     # Dependency graphs (GraphML)
+  labels.json                 # resource_id → [labels] mapping
 ```
 
-## Roadmap (high level)
-- Milestone 1: Repo scaffolding, core Bicep modules, deploy + harvest.
-- Milestone 2: Fuzzer & labels; mutation recipes and constraints.
-- Milestone 3: Dataset ops, feature exporters.
-- Milestone 4: Graph export (nodes/edges) for cross‑resource patterns.
-- Milestone 5: Modeling baselines (CatBoost/XGBoost + graph models).
-- Milestone 6: Validation & capstone write‑up.
+## Adding New Mutations
 
-See **prd.md** for the full requirements and design.
+Mutations are defined in Python for type safety and flexibility:
+
+```python
+# crux/mutations/storage.py
+from .base import Mutation
+
+def mutate_public_blob_access(resource):
+    if "properties" not in resource:
+        resource["properties"] = {}
+    resource["properties"]["allowBlobPublicAccess"] = True
+    return resource
+
+STORAGE_PUBLIC_BLOB_ACCESS = Mutation(
+    id="storage_public_blob_access",
+    target_type="Microsoft.Storage/storageAccounts",
+    description="Enable public blob access",
+    severity="high",
+    labels=["Storage_PublicAccess", "CIS_3.7"],
+    cis_references=["3.7"],
+    mutate=mutate_public_blob_access,
+)
+```
+
+## Adding New Rules
+
+Security rules are defined in YAML for easy review by security teams:
+
+```yaml
+# rules/storage.yaml
+rules:
+  - id: storage-public-blob-access
+    resource_type: Microsoft.Storage/storageAccounts
+    severity: high
+    cis_reference: "3.7"
+    condition:
+      property: properties.allowBlobPublicAccess
+      equals: true
+    labels:
+      - Storage_PublicAccess
+      - CIS_3.7
+```
+
+## Development
+
+```bash
+# Run tests
+pytest
+
+# Format code
+black crux/
+
+# Type checking
+mypy crux/
+
+# Linting
+ruff check crux/
+```
+
+## Roadmap
+
+See **prd.md** for the full requirements and milestones.
+
+- ✅ Milestone 0: Repository restructuring and devcontainer setup
+- ✅ Milestone 1: Core infrastructure (templates, mutations, rules, dataset generator)
+- 🔄 Milestone 2: Large-scale dataset generation (1000+ templates)
+- 🔄 Milestone 3: ML validation (baseline models)
+- 🔄 Milestone 4: Graph analysis and cross-resource patterns
+
+## Archive: Option A (Azure Deployment-Based Analysis)
+
+The original Option A approach (deploying to Azure and harvesting runtime state) has been archived to the `archive/option-a` branch. Option D (static template analysis) is now the primary approach due to:
+- Zero Azure costs
+- Faster iteration (hours vs. weeks)
+- Larger dataset generation capacity
+- Reproducibility (no Azure API flakiness)

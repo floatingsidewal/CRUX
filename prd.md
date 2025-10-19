@@ -1,5 +1,19 @@
 CRUX (Cloud Resource Configuration Analyzer)
 
+**NOTE: This project has pivoted to Option D (Static Template Analysis)**
+
+The original PRD below describes Option A (Azure deployment-based analysis). As of 2025-01-19, CRUX now uses **Option D: Static Template Analysis**, which:
+- Analyzes Bicep/ARM templates locally (zero Azure cost)
+- Generates datasets from Azure Quickstart Templates (1000+ examples)
+- Applies mutations and labels without deploying resources
+- See README.md and CLAUDE.md for updated architecture
+
+The Option A codebase is preserved in the `archive/option-a` branch.
+
+---
+
+# Original PRD (Option A - Archived)
+
 1. Problem Statement
 Misconfigurations in Azure resource deployments are a leading cause of outages, security incidents, and support tickets. Rule-based policy engines catch obvious violations but often miss subtle, cross-resource issues. CRUX generates a high-quality labeled dataset by deploying small, parameterized Bicep-based environments, harvesting their configuration state, applying controlled misconfigurations (mutations), and harvesting again. These data support research and prototyping of ML models that detect misconfigurations across heterogeneous resources and their relationships.
 

@@ -1,0 +1,158 @@
+# Storage Account Security Rules
+# Based on CIS Microsoft Azure Foundations Benchmark v2.0.0
+# and Azure Security Best Practices
+
+rules:
+  - id: storage-public-blob-access
+    name: "Storage Account Public Blob Access"
+    description: "Storage account allows public blob access"
+    resource_type: Microsoft.Storage/storageAccounts
+    severity: high
+    cis_reference: "3.7"
+    condition:
+      property: properties.allowBlobPublicAccess
+      equals: true
+    labels:
+      - Storage_PublicAccess
+      - CIS_3.7
+
+  - id: storage-weak-tls
+    name: "Storage Account Weak TLS Version"
+    description: "Storage account allows TLS 1.0 or 1.1"
+    resource_type: Microsoft.Storage/storageAccounts
+    severity: medium
+    cis_reference: "3.8"
+    condition:
+      property: properties.minimumTlsVersion
+      not_in:
+        - TLS1_2
+        - TLS1_3
+    labels:
+      - Storage_WeakTLS
+      - CIS_3.8
+
+  - id: storage-http-allowed
+    name: "Storage Account HTTP Traffic Allowed"
+    description: "Storage account allows HTTP traffic (not HTTPS-only)"
+    resource_type: Microsoft.Storage/storageAccounts
+    severity: high
+    cis_reference: "3.1"
+    condition:
+      property: properties.supportsHttpsTrafficOnly
+      equals: false
+    labels:
+      - Storage_HTTPAllowed
+      - CIS_3.1
+
+  - id: storage-firewall-open
+    name: "Storage Account Firewall Open to All"
+    description: "Storage account network rules allow all traffic"
+    resource_type: Microsoft.Storage/storageAccounts
+    severity: high
+    cis_reference: "3.6"
+    condition:
+      property: properties.networkAcls.defaultAction
+      equals: Allow
+    labels:
+      - Storage_FirewallOpen
+      - CIS_3.6
+
+  - id: storage-no-soft-delete
+    name: "Storage Account Blob Soft Delete Disabled"
+    description: "Blob soft delete is not enabled"
+    resource_type: Microsoft.Storage/storageAccounts
+    severity: medium
+    cis_reference: "3.10"
+    condition:
+      property: properties.deleteRetentionPolicy.enabled
+      equals: false
+    labels:
+      - Storage_NoSoftDelete
+      - CIS_3.10
+
+  - id: storage-shared-key-access
+    name: "Storage Account Shared Key Access Enabled"
+    description: "Storage account allows shared key access (should use Azure AD only)"
+    resource_type: Microsoft.Storage/storageAccounts
+    severity: medium
+    cis_reference: ""
+    condition:
+      property: properties.allowSharedKeyAccess
+      equals: true
+    labels:
+      - Storage_SharedKeyAccess
+
+  - id: storage-no-versioning
+    name: "Storage Account Blob Versioning Disabled"
+    description: "Blob versioning is not enabled"
+    resource_type: Microsoft.Storage/storageAccounts
+    severity: low
+    cis_reference: ""
+    condition:
+      property: properties.isVersioningEnabled
+      equals: false
+    labels:
+      - Storage_NoVersioning
+
+  - id: storage-no-infrastructure-encryption
+    name: "Storage Account Infrastructure Encryption Disabled"
+    description: "Infrastructure encryption is not enabled"
+    resource_type: Microsoft.Storage/storageAccounts
+    severity: medium
+    cis_reference: ""
+    condition:
+      property: properties.encryption.requireInfrastructureEncryption
+      equals: false
+    labels:
+      - Storage_NoInfraEncryption
+
+  - id: storage-cross-tenant-replication
+    name: "Storage Account Cross-Tenant Replication Enabled"
+    description: "Storage account allows cross-tenant replication"
+    resource_type: Microsoft.Storage/storageAccounts
+    severity: low
+    cis_reference: ""
+    condition:
+      property: properties.allowCrossTenantReplication
+      equals: true
+    labels:
+      - Storage_CrossTenantReplication
+
+  - id: storage-logging-disabled
+    name: "Storage Account Logging Disabled"
+    description: "Storage analytics logging is not configured"
+    resource_type: Microsoft.Storage/storageAccounts
+    severity: low
+    cis_reference: "3.3"
+    condition:
+      property: properties.logging.read
+      equals: false
+    labels:
+      - Storage_NoLogging
+      - CIS_3.3
+
+  # Additional rules for comprehensive coverage
+
+  - id: storage-no-encryption
+    name: "Storage Account Encryption Disabled"
+    description: "Storage account does not require encryption"
+    resource_type: Microsoft.Storage/storageAccounts
+    severity: critical
+    cis_reference: ""
+    condition:
+      property: properties.encryption.services.blob.enabled
+      equals: false
+    labels:
+      - Storage_NoEncryption
+
+  - id: storage-default-no-encryption
+    name: "Storage Account Missing Encryption Configuration"
+    description: "Storage account does not have encryption services configured"
+    resource_type: Microsoft.Storage/storageAccounts
+    severity: medium
+    cis_reference: ""
+    condition:
+      property: properties.encryption.services
+      exists: false
+    labels:
+      - Storage_MissingEncryptionConfig
