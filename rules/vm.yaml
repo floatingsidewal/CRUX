@@ -1,0 +1,158 @@
+rules:
+  # VM Encryption Rules
+  - id: vm-no-disk-encryption
+    name: VM Disk Encryption Disabled
+    resource_type: Microsoft.Compute/virtualMachines
+    severity: critical
+    cis_reference: "7.1"
+    description: VM does not have disk encryption enabled
+    condition:
+      property: properties.storageProfile.osDisk.encryptionSettings
+      exists: false
+    labels:
+      - VM_NoEncryption
+      - CIS_7.1
+
+  - id: vm-no-managed-disk-encryption
+    name: VM Managed Disk Encryption Disabled
+    resource_type: Microsoft.Compute/virtualMachines
+    severity: high
+    description: VM managed disk does not have encryption at rest
+    condition:
+      property: properties.storageProfile.osDisk.managedDisk.diskEncryptionSet
+      exists: false
+    labels:
+      - VM_NoManagedDiskEncryption
+
+  # VM Authentication Rules
+  - id: vm-password-auth-enabled
+    name: VM Password Authentication Enabled
+    resource_type: Microsoft.Compute/virtualMachines
+    severity: high
+    cis_reference: "7.2"
+    description: VM allows password authentication instead of key-based auth
+    condition:
+      property: properties.osProfile.linuxConfiguration.disablePasswordAuthentication
+      equals: false
+    labels:
+      - VM_PasswordAuthEnabled
+      - CIS_7.2
+
+  # VM Diagnostics Rules
+  - id: vm-no-boot-diagnostics
+    name: VM Boot Diagnostics Disabled
+    resource_type: Microsoft.Compute/virtualMachines
+    severity: medium
+    description: VM does not have boot diagnostics enabled
+    condition:
+      property: properties.diagnosticsProfile.bootDiagnostics.enabled
+      equals: false
+    labels:
+      - VM_NoBootDiagnostics
+
+  - id: vm-boot-diagnostics-missing
+    name: VM Boot Diagnostics Not Configured
+    resource_type: Microsoft.Compute/virtualMachines
+    severity: medium
+    description: VM does not have boot diagnostics configured
+    condition:
+      property: properties.diagnosticsProfile.bootDiagnostics
+      exists: false
+    labels:
+      - VM_NoBootDiagnostics
+
+  # VM Patching Rules
+  - id: vm-manual-patching
+    name: VM Automatic Patching Disabled
+    resource_type: Microsoft.Compute/virtualMachines
+    severity: medium
+    description: VM configured for manual patching instead of automatic
+    condition:
+      property: properties.osProfile.linuxConfiguration.patchSettings.patchMode
+      equals: Manual
+    labels:
+      - VM_NoAutoPatch
+
+  # VM Security Rules
+  - id: vm-no-secure-boot
+    name: VM Secure Boot Disabled
+    resource_type: Microsoft.Compute/virtualMachines
+    severity: high
+    cis_reference: "7.5"
+    description: VM does not have secure boot enabled
+    condition:
+      property: properties.securityProfile.uefiSettings.secureBootEnabled
+      equals: false
+    labels:
+      - VM_NoSecureBoot
+      - CIS_7.5
+
+  - id: vm-no-vtpm
+    name: VM vTPM Disabled
+    resource_type: Microsoft.Compute/virtualMachines
+    severity: high
+    description: VM does not have virtual TPM enabled
+    condition:
+      property: properties.securityProfile.uefiSettings.vTpmEnabled
+      equals: false
+    labels:
+      - VM_NoVTPM
+
+  # VM Disk Management Rules
+  - id: vm-unmanaged-disk
+    name: VM Using Unmanaged Disk
+    resource_type: Microsoft.Compute/virtualMachines
+    severity: medium
+    description: VM uses unmanaged disks instead of managed disks
+    condition:
+      property: properties.storageProfile.osDisk.vhd
+      exists: true
+    labels:
+      - VM_UnmanagedDisk
+
+  # VM Identity Rules
+  - id: vm-no-managed-identity
+    name: VM No Managed Identity
+    resource_type: Microsoft.Compute/virtualMachines
+    severity: medium
+    description: VM does not have a managed identity configured
+    condition:
+      property: identity
+      exists: false
+    labels:
+      - VM_NoManagedIdentity
+
+  - id: vm-identity-disabled
+    name: VM Managed Identity Type None
+    resource_type: Microsoft.Compute/virtualMachines
+    severity: medium
+    description: VM has managed identity type set to None
+    condition:
+      property: identity.type
+      equals: None
+    labels:
+      - VM_NoManagedIdentity
+
+  # VM Availability Rules
+  - id: vm-no-availability-set
+    name: VM No Availability Set
+    resource_type: Microsoft.Compute/virtualMachines
+    severity: low
+    description: VM is not part of an availability set
+    condition:
+      property: properties.availabilitySet
+      exists: false
+    labels:
+      - VM_NoAvailability
+
+  # VM Size Rules
+  - id: vm-outdated-size
+    name: VM Using Outdated Size
+    resource_type: Microsoft.Compute/virtualMachines
+    severity: low
+    description: VM uses outdated A-series size without modern security features
+    condition:
+      property: properties.hardwareProfile.vmSize
+      regex_match: "^Standard_A[0-9]"
+    labels:
+      - VM_OutdatedSize

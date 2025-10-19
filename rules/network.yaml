@@ -1,0 +1,210 @@
+rules:
+  # NSG - Critical Inbound Rules
+  - id: nsg-allow-all-inbound
+    name: NSG Allows All Inbound Traffic
+    resource_type: Microsoft.Network/networkSecurityGroups
+    severity: critical
+    cis_reference: "6.1"
+    description: NSG has rule allowing all inbound traffic from anywhere
+    condition:
+      property: properties.securityRules
+      # This will match if ANY rule allows all inbound (checked by custom logic)
+      exists: true
+    labels:
+      - NSG_AllowAllInbound
+      - CIS_6.1
+
+  - id: nsg-open-ssh
+    name: NSG Allows SSH From Internet
+    resource_type: Microsoft.Network/networkSecurityGroups
+    severity: critical
+    cis_reference: "6.2"
+    description: NSG allows SSH (port 22) from any source
+    condition:
+      property: properties.securityRules
+      exists: true
+    labels:
+      - NSG_OpenSSH
+      - CIS_6.2
+
+  - id: nsg-open-rdp
+    name: NSG Allows RDP From Internet
+    resource_type: Microsoft.Network/networkSecurityGroups
+    severity: critical
+    cis_reference: "6.3"
+    description: NSG allows RDP (port 3389) from any source
+    condition:
+      property: properties.securityRules
+      exists: true
+    labels:
+      - NSG_OpenRDP
+      - CIS_6.3
+
+  - id: nsg-open-database
+    name: NSG Allows Database Ports From Internet
+    resource_type: Microsoft.Network/networkSecurityGroups
+    severity: critical
+    cis_reference: "6.4"
+    description: NSG allows database ports (1433, 3306, 5432) from any source
+    condition:
+      property: properties.securityRules
+      exists: true
+    labels:
+      - NSG_OpenDatabase
+      - CIS_6.4
+
+  - id: nsg-open-ftp
+    name: NSG Allows FTP From Internet
+    resource_type: Microsoft.Network/networkSecurityGroups
+    severity: high
+    description: NSG allows FTP (port 21) from any source
+    condition:
+      property: properties.securityRules
+      exists: true
+    labels:
+      - NSG_OpenFTP
+
+  # NSG - Configuration Rules
+  - id: nsg-no-deny-rules
+    name: NSG Has No Default Deny Rules
+    resource_type: Microsoft.Network/networkSecurityGroups
+    severity: high
+    description: NSG does not have explicit deny rules
+    condition:
+      property: properties.securityRules
+      exists: true
+    labels:
+      - NSG_NoDefaultDeny
+
+  - id: nsg-empty-rules
+    name: NSG Has No Security Rules
+    resource_type: Microsoft.Network/networkSecurityGroups
+    severity: medium
+    description: NSG has no custom security rules configured
+    condition:
+      property: properties.securityRules
+      exists: false
+    labels:
+      - NSG_NoRules
+
+  # VNet - DDoS Protection
+  - id: vnet-no-ddos-protection
+    name: VNet DDoS Protection Disabled
+    resource_type: Microsoft.Network/virtualNetworks
+    severity: high
+    cis_reference: "6.5"
+    description: Virtual network does not have DDoS protection enabled
+    condition:
+      property: properties.enableDdosProtection
+      equals: false
+    labels:
+      - VNet_NoDDoSProtection
+      - CIS_6.5
+
+  - id: vnet-ddos-not-configured
+    name: VNet DDoS Protection Not Configured
+    resource_type: Microsoft.Network/virtualNetworks
+    severity: high
+    cis_reference: "6.5"
+    description: Virtual network does not have DDoS protection configured
+    condition:
+      property: properties.enableDdosProtection
+      exists: false
+    labels:
+      - VNet_NoDDoSProtection
+      - CIS_6.5
+
+  # VNet - VM Protection
+  - id: vnet-no-vm-protection
+    name: VNet VM Protection Disabled
+    resource_type: Microsoft.Network/virtualNetworks
+    severity: medium
+    description: Virtual network does not have VM protection enabled
+    condition:
+      property: properties.enableVmProtection
+      equals: false
+    labels:
+      - VNet_NoVMProtection
+
+  - id: vnet-vm-protection-not-configured
+    name: VNet VM Protection Not Configured
+    resource_type: Microsoft.Network/virtualNetworks
+    severity: medium
+    description: Virtual network does not have VM protection configured
+    condition:
+      property: properties.enableVmProtection
+      exists: false
+    labels:
+      - VNet_NoVMProtection
+
+  # VNet - Subnet Security
+  - id: vnet-subnet-no-nsg
+    name: VNet Subnet Without NSG
+    resource_type: Microsoft.Network/virtualNetworks
+    severity: high
+    cis_reference: "6.6"
+    description: Virtual network has subnets without network security groups
+    condition:
+      property: properties.subnets
+      exists: true
+    labels:
+      - VNet_SubnetNoNSG
+      - CIS_6.6
+
+  - id: vnet-no-service-endpoints
+    name: VNet No Service Endpoints
+    resource_type: Microsoft.Network/virtualNetworks
+    severity: medium
+    description: Virtual network subnets do not have service endpoints configured
+    condition:
+      property: properties.subnets
+      exists: true
+    labels:
+      - VNet_NoServiceEndpoints
+
+  # VNet - Address Space
+  - id: vnet-broad-address-space
+    name: VNet Overly Broad Address Space
+    resource_type: Microsoft.Network/virtualNetworks
+    severity: low
+    description: Virtual network uses overly broad address space (/8)
+    condition:
+      property: properties.addressSpace.addressPrefixes
+      exists: true
+    labels:
+      - VNet_BroadAddressSpace
+
+  # VNet - BGP
+  - id: vnet-bgp-disabled
+    name: VNet BGP Route Propagation Disabled
+    resource_type: Microsoft.Network/virtualNetworks
+    severity: low
+    description: Virtual network has BGP route propagation disabled
+    condition:
+      property: properties.subnets
+      exists: true
+    labels:
+      - VNet_NoBGP
+
+  # VNet - Basic Configuration
+  - id: vnet-no-subnets
+    name: VNet Has No Subnets
+    resource_type: Microsoft.Network/virtualNetworks
+    severity: medium
+    description: Virtual network has no subnets configured
+    condition:
+      property: properties.subnets
+      exists: false
+    labels:
+      - VNet_NoSubnets
+
+  - id: vnet-missing-address-space
+    name: VNet Missing Address Space
+    resource_type: Microsoft.Network/virtualNetworks
+    severity: critical
+    description: Virtual network does not have address space configured
+    condition:
+      property: properties.addressSpace
+      exists: false
+    labels:
+      - VNet_NoAddressSpace

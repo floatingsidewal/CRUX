@@ -11,7 +11,7 @@ from pathlib import Path
 
 from .templates.fetcher import TemplateFetcher
 from .dataset.generator import DatasetGenerator
-from .mutations import storage as storage_mutations
+from .mutations import ALL_MUTATIONS
 
 # Configure logging
 logging.basicConfig(
@@ -66,7 +66,7 @@ def cmd_generate_dataset(args: argparse.Namespace) -> None:
         logger.info(f"Limited to {len(template_files)} templates")
 
     # Load mutations
-    mutations = storage_mutations.ALL_MUTATIONS
+    mutations = ALL_MUTATIONS
     logger.info(f"Loaded {len(mutations)} mutations")
 
     # Initialize generator
@@ -95,7 +95,7 @@ def cmd_list_mutations(args: argparse.Namespace) -> None:
     """List available mutations."""
     logger.info("Available mutations:\n")
 
-    mutations = storage_mutations.ALL_MUTATIONS
+    mutations = ALL_MUTATIONS
 
     # Group by severity
     by_severity = {}
