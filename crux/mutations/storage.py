@@ -25,8 +25,8 @@ STORAGE_PUBLIC_BLOB_ACCESS = Mutation(
     description="Enable public blob access on storage account",
     severity="high",
     labels=["Storage_PublicAccess", "CIS_3.7"],
-    cis_references=["3.7"],
     mutate=mutate_public_blob_access,
+    cis_references=["3.7"],
 )
 
 
@@ -74,8 +74,8 @@ STORAGE_OPEN_FIREWALL = Mutation(
     description="Set firewall to allow all network traffic",
     severity="high",
     labels=["Storage_FirewallOpen", "CIS_3.6"],
-    cis_references=["3.6"],
     mutate=mutate_open_firewall,
+    cis_references=["3.6"],
 )
 
 
@@ -123,8 +123,8 @@ STORAGE_NO_SOFT_DELETE = Mutation(
     description="Disable blob soft delete",
     severity="medium",
     labels=["Storage_NoSoftDelete", "CIS_3.10"],
-    cis_references=["3.10"],
     mutate=mutate_disable_soft_delete,
+    cis_references=["3.10"],
 )
 
 

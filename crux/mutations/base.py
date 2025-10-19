@@ -32,8 +32,8 @@ class Mutation:
     description: str
     severity: str
     labels: List[str]
-    cis_references: List[str] = field(default_factory=list)
     mutate: Callable[[Dict[str, Any]], Dict[str, Any]] = field(repr=False)
+    cis_references: List[str] = field(default_factory=list)
 
     def __post_init__(self):
         """Validate mutation configuration."""
@@ -42,6 +42,18 @@ class Mutation:
             raise ValueError(
                 f"Invalid severity '{self.severity}'. Must be one of {valid_severities}"
             )
+
+    def applies_to(self, resource: Dict[str, Any]) -> bool:
+        """
+        Check if this mutation applies to a given resource.
+
+        Args:
+            resource: Resource to check
+
+        Returns:
+            True if mutation can be applied to this resource
+        """
+        return resource.get("type") == self.target_type
 
     def apply(self, resource: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """
@@ -283,6 +295,6 @@ def create_property_mutation(
         description=description,
         severity=severity,
         labels=labels,
-        cis_references=cis_references or [],
         mutate=mutate_func,
+        cis_references=cis_references or [],
     )
