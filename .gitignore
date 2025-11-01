@@ -209,9 +209,11 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
- 
+
 # CRUX datasets and build outputs (root level only)
 /dataset/
 /templates/
 out/
 .DS_Store
+*.json.compiled
+*.arm.json
