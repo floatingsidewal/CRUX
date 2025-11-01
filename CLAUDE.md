@@ -189,6 +189,176 @@ Each resource in `labels.json` maps to a list of misconfiguration labels:
 }
 ```
 
+## ML Pipeline (Milestone 3)
+
+### Overview
+
+The ML pipeline trains machine learning models to detect misconfigurations from the generated datasets. It includes feature extraction, model training, evaluation, and prediction capabilities.
+
+### Components
+
+#### 1. Feature Extractor (`crux/ml/features.py`)
+
+Converts JSON resources to numerical feature vectors:
+- Encodes resource types
+- Extracts and flattens nested properties
+- Converts boolean/string/numeric values to floats
+- Handles missing properties gracefully
+
+```python
+from crux.ml.features import FeatureExtractor
+
+extractor = FeatureExtractor(max_features=100)
+X, resource_ids = extractor.fit_transform(resources)
+# X is (n_samples, n_features) numpy array
+```
+
+#### 2. Dataset Loader (`crux/ml/dataset.py`)
+
+Loads and prepares datasets for training:
+- Reads baseline and mutated resources
+- Aligns resources with labels
+- Multi-label encoding
+- Train/validation/test splits
+
+```python
+from crux.ml.dataset import DatasetLoader
+
+loader = DatasetLoader("dataset/exp-20240101-120000")
+train_res, val_res, test_res, train_labels, val_labels, test_labels, label_names = loader.load_and_prepare()
+```
+
+#### 3. Baseline Models (`crux/ml/models.py`)
+
+Two baseline models for multi-label classification:
+- **Random Forest**: Ensemble of decision trees
+- **XGBoost**: Gradient boosted trees
+
+```python
+from crux.ml.models import RandomForestModel, XGBoostModel
+
+# Random Forest
+model = RandomForestModel(n_estimators=100, random_state=42)
+model.fit(X_train, y_train, feature_names=features, label_names=labels)
+
+# XGBoost
+model = XGBoostModel(n_estimators=100, learning_rate=0.1, random_state=42)
+model.fit(X_train, y_train, feature_names=features, label_names=labels)
+
+# Predict
+y_pred = model.predict(X_test)
+
+# Save/Load
+model.save("models/my_model.pkl")
+model.load("models/my_model.pkl")
+```
+
+#### 4. Model Evaluator (`crux/ml/evaluation.py`)
+
+Comprehensive evaluation metrics for multi-label classification:
+- Macro/Micro/Weighted averaging
+- Per-label performance
+- Confusion matrices
+- Error analysis
+
+```python
+from crux.ml.evaluation import ModelEvaluator
+
+evaluator = ModelEvaluator(label_names=labels)
+metrics = evaluator.evaluate(y_true, y_pred, y_proba)
+
+# Print formatted report
+evaluator.print_report(metrics)
+
+# Save to JSON
+evaluator.save_report(metrics, "results/evaluation.json")
+```
+
+### CLI Commands
+
+#### Train a Model
+
+```bash
+# Train Random Forest on a dataset
+crux train-model \
+  --dataset dataset/exp-20240101-120000 \
+  --model random-forest \
+  --output models \
+  --name my-rf-model
+
+# Train XGBoost
+crux train-model \
+  --dataset dataset/exp-20240101-120000 \
+  --model xgboost \
+  --output models \
+  --name my-xgb-model \
+  --max-features 150
+```
+
+Output:
+- `models/my-rf-model.pkl` - Trained model
+- `models/my-rf-model_features.pkl` - Feature extractor
+- `models/my-rf-model_metrics.json` - Evaluation metrics
+
+#### Evaluate a Model
+
+```bash
+crux evaluate-model \
+  --model models/my-rf-model.pkl \
+  --dataset dataset/exp-20240101-120000 \
+  --output results/evaluation.json
+```
+
+### Workflow Example
+
+```bash
+# 1. Generate a dataset (Milestone 2)
+crux generate-dataset \
+  --templates templates/azure-quickstart-templates \
+  --rules rules/ \
+  --output dataset/ \
+  --name exp-001 \
+  --limit 100
+
+# 2. Train a Random Forest model (Milestone 3)
+crux train-model \
+  --dataset dataset/exp-001 \
+  --model random-forest \
+  --output models \
+  --name rf-baseline
+
+# 3. Train an XGBoost model for comparison
+crux train-model \
+  --dataset dataset/exp-001 \
+  --model xgboost \
+  --output models \
+  --name xgb-baseline
+
+# 4. Evaluate the Random Forest model
+crux evaluate-model \
+  --model models/rf-baseline.pkl \
+  --dataset dataset/exp-001 \
+  --output results/rf-eval.json
+```
+
+### Model Performance Metrics
+
+The evaluation framework provides:
+
+**Overall Metrics:**
+- Exact Match Ratio: Percentage of samples with all labels correct
+- Sample Accuracy: Accuracy at the sample level
+- Hamming Loss: Fraction of incorrect labels
+
+**Aggregated Metrics (Macro/Micro/Weighted):**
+- Precision: True Positives / (True Positives + False Positives)
+- Recall: True Positives / (True Positives + False Negatives)
+- F1 Score: Harmonic mean of Precision and Recall
+
+**Per-Label Metrics:**
+- Individual Precision, Recall, F1 for each misconfiguration label
+- Support: Number of true occurrences of each label
+
 ## Development Workflow
 
 ### Adding New Mutations

@@ -148,6 +148,161 @@ def cmd_list_rules(args: argparse.Namespace) -> None:
                     print(f"    CIS: {rule.get('cis_reference')}")
 
 
+def cmd_train_model(args: argparse.Namespace) -> None:
+    """Train a machine learning model on a dataset."""
+    from datetime import datetime
+    from .ml.dataset import DatasetLoader
+    from .ml.features import FeatureExtractor
+    from .ml.models import RandomForestModel, XGBoostModel
+    from .ml.evaluation import ModelEvaluator
+
+    logger.info(f"Training {args.model} model on dataset {args.dataset}")
+
+    # Load dataset
+    loader = DatasetLoader(args.dataset)
+    (
+        train_res,
+        val_res,
+        test_res,
+        train_labels,
+        val_labels,
+        test_labels,
+        label_names,
+    ) = loader.load_and_prepare(
+        include_baseline=False,
+        test_size=args.test_size,
+        val_size=args.val_size,
+    )
+
+    logger.info(f"Loaded {len(train_res)} train, {len(val_res)} val, {len(test_res)} test samples")
+    logger.info(f"Training for {len(label_names)} labels: {', '.join(label_names[:5])}...")
+
+    # Extract features
+    feature_extractor = FeatureExtractor(max_features=args.max_features)
+    X_train, _ = feature_extractor.fit_transform(train_res)
+    X_val, _ = feature_extractor.transform(val_res)
+    X_test, _ = feature_extractor.transform(test_res)
+
+    logger.info(f"Extracted {X_train.shape[1]} features per sample")
+
+    # Create model
+    if args.model == "random-forest":
+        model = RandomForestModel(n_estimators=100, random_state=42)
+    elif args.model == "xgboost":
+        model = XGBoostModel(n_estimators=100, random_state=42)
+    else:
+        logger.error(f"Unknown model type: {args.model}")
+        sys.exit(1)
+
+    # Train model
+    model.fit(
+        X_train,
+        train_labels,
+        feature_names=feature_extractor.get_feature_names(),
+        label_names=label_names,
+    )
+
+    # Evaluate on validation set
+    logger.info("\nValidation set evaluation:")
+    y_val_pred = model.predict(X_val)
+    evaluator = ModelEvaluator(label_names)
+    val_metrics = evaluator.evaluate(val_labels, y_val_pred)
+    evaluator.print_report(val_metrics)
+
+    # Evaluate on test set
+    logger.info("\nTest set evaluation:")
+    y_test_pred = model.predict(X_test)
+    test_metrics = evaluator.evaluate(test_labels, y_test_pred)
+    evaluator.print_report(test_metrics)
+
+    # Save model
+    model_name = args.name or f"model-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+    output_dir = Path(args.output)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    model_path = output_dir / f"{model_name}.pkl"
+    model.save(str(model_path))
+
+    # Save feature extractor
+    import pickle
+    feature_path = output_dir / f"{model_name}_features.pkl"
+    with open(feature_path, "wb") as f:
+        pickle.dump(feature_extractor, f)
+    logger.info(f"Feature extractor saved to {feature_path}")
+
+    # Save evaluation metrics
+    metrics_path = output_dir / f"{model_name}_metrics.json"
+    import json
+    with open(metrics_path, "w") as f:
+        json.dump({
+            "validation": val_metrics,
+            "test": test_metrics,
+        }, f, indent=2)
+    logger.info(f"Metrics saved to {metrics_path}")
+
+    logger.info(f"\nModel training complete!")
+    logger.info(f"  Model: {model_path}")
+    logger.info(f"  Test F1 Score (macro): {test_metrics['f1_macro']:.3f}")
+    logger.info(f"  Test F1 Score (micro): {test_metrics['f1_micro']:.3f}")
+
+
+def cmd_evaluate_model(args: argparse.Namespace) -> None:
+    """Evaluate a trained model on a dataset."""
+    import pickle
+    from .ml.dataset import DatasetLoader
+    from .ml.features import FeatureExtractor
+    from .ml.models import BaselineModel
+    from .ml.evaluation import ModelEvaluator
+
+    logger.info(f"Evaluating model {args.model} on dataset {args.dataset}")
+
+    # Load model
+    model = BaselineModel("Loaded")
+    model.load(args.model)
+    logger.info(f"Loaded model with {len(model.label_names)} labels")
+
+    # Load feature extractor
+    feature_path = Path(args.model).parent / f"{Path(args.model).stem}_features.pkl"
+    if not feature_path.exists():
+        logger.error(f"Feature extractor not found: {feature_path}")
+        logger.info("Please ensure the feature extractor was saved alongside the model")
+        sys.exit(1)
+
+    with open(feature_path, "rb") as f:
+        feature_extractor = pickle.load(f)
+    logger.info(f"Loaded feature extractor with {len(feature_extractor.feature_names)} features")
+
+    # Load dataset
+    loader = DatasetLoader(args.dataset)
+    resources = loader.load_resources(include_baseline=False, include_mutated=True)
+    labels_dict = loader.load_labels()
+
+    # Prepare data
+    labeled_resources, label_matrix, label_names = loader.prepare_training_data(
+        resources, labels_dict
+    )
+
+    # Extract features
+    X, _ = feature_extractor.transform(labeled_resources)
+
+    # Predict
+    y_pred = model.predict(X)
+    y_proba = model.predict_proba(X)
+
+    # Evaluate
+    evaluator = ModelEvaluator(label_names)
+    metrics = evaluator.evaluate(label_matrix, y_pred, y_proba)
+    evaluator.print_report(metrics)
+
+    # Save report if requested
+    if args.output:
+        evaluator.save_report(metrics, args.output)
+
+    logger.info(f"\nEvaluation complete!")
+    logger.info(f"  F1 Score (macro): {metrics['f1_macro']:.3f}")
+    logger.info(f"  F1 Score (micro): {metrics['f1_micro']:.3f}")
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build the argument parser."""
     parser = argparse.ArgumentParser(
@@ -255,6 +410,77 @@ def build_parser() -> argparse.ArgumentParser:
         help="Directory containing YAML rule files",
     )
     list_rules_parser.set_defaults(func=cmd_list_rules)
+
+    # train-model command
+    train_parser = subparsers.add_parser(
+        "train-model",
+        help="Train a model on a dataset",
+    )
+    train_parser.add_argument(
+        "--dataset",
+        required=True,
+        help="Path to dataset directory (e.g., dataset/exp-20240101-120000)",
+    )
+    train_parser.add_argument(
+        "--model",
+        choices=["xgboost", "random-forest"],
+        default="random-forest",
+        help="Model type to train",
+    )
+    train_parser.add_argument(
+        "--output",
+        default="models",
+        help="Output directory for trained model",
+    )
+    train_parser.add_argument(
+        "--name",
+        help="Model name (default: model-YYYYMMDD-HHMMSS)",
+    )
+    train_parser.add_argument(
+        "--test-size",
+        type=float,
+        default=0.2,
+        help="Proportion of data for test set (default: 0.2)",
+    )
+    train_parser.add_argument(
+        "--val-size",
+        type=float,
+        default=0.1,
+        help="Proportion of training data for validation (default: 0.1)",
+    )
+    train_parser.add_argument(
+        "--max-features",
+        type=int,
+        default=100,
+        help="Maximum number of features to extract (default: 100)",
+    )
+    train_parser.set_defaults(func=cmd_train_model)
+
+    # evaluate-model command
+    evaluate_parser = subparsers.add_parser(
+        "evaluate-model",
+        help="Evaluate a trained model",
+    )
+    evaluate_parser.add_argument(
+        "--model",
+        required=True,
+        help="Path to trained model file",
+    )
+    evaluate_parser.add_argument(
+        "--dataset",
+        required=True,
+        help="Path to dataset directory",
+    )
+    evaluate_parser.add_argument(
+        "--output",
+        help="Path to save evaluation report (JSON)",
+    )
+    evaluate_parser.add_argument(
+        "--test-only",
+        action="store_true",
+        help="Evaluate on test set only (default: all data)",
+    )
+    evaluate_parser.set_defaults(func=cmd_evaluate_model)
 
     return parser
 
