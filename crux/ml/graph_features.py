@@ -120,7 +120,8 @@ class GraphFeatureExtractor:
     def _extract_node_features(self, attrs: Dict[str, Any]) -> np.ndarray:
         """Extract feature vector from node attributes."""
         num_features = len(self.feature_names) + 1
-        features = np.zeros(num_features, dtype=np.float32)
+        # Initialize with -1.0 to distinguish missing properties from False booleans
+        features = np.full(num_features, -1.0, dtype=np.float32)
 
         # Feature 0: Resource type (encoded)
         if "type" in attrs:

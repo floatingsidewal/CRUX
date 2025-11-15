@@ -121,7 +121,8 @@ class FeatureExtractor:
 
     def _extract_features(self, resource: Dict[str, Any]) -> np.ndarray:
         """Extract feature vector from a single resource."""
-        features = np.zeros(len(self.feature_names))
+        # Initialize with -1.0 to distinguish missing properties from False booleans
+        features = np.full(len(self.feature_names), -1.0)
 
         # Resource type encoding
         resource_type = resource.get("type", "unknown")
@@ -131,12 +132,12 @@ class FeatureExtractor:
             # Use hash for unknown types
             features[0] = hash(resource_type) % 1000
 
-        # Has properties
+        # Has properties (0 or 1, not -1)
         properties = resource.get("properties", {})
         features[1] = 1.0 if properties else 0.0
 
-        # Number of properties
-        features[2] = len(properties) if properties else 0.0
+        # Number of properties (count, starts at 0)
+        features[2] = float(len(properties)) if properties else 0.0
 
         # Extract property values
         property_paths = self._extract_property_paths(properties)
@@ -150,7 +151,7 @@ class FeatureExtractor:
         return features
 
     def _extract_property_paths(
-        self, obj: Any, prefix: str = "", max_depth: int = 3
+        self, obj: Any, prefix: str = "", max_depth: int = 5
     ) -> Dict[str, float]:
         """
         Recursively extract property paths and convert to numerical values.
