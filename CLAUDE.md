@@ -359,6 +359,305 @@ The evaluation framework provides:
 - Individual Precision, Recall, F1 for each misconfiguration label
 - Support: Number of true occurrences of each label
 
+## GNN Pipeline (Milestone 4)
+
+### Overview
+
+The GNN (Graph Neural Network) pipeline leverages dependency graphs between Azure resources to detect misconfigurations. Unlike baseline models that treat resources independently, GNNs can learn from cross-resource patterns and dependencies.
+
+### Key Advantages
+
+- **Graph-Aware**: Considers relationships between resources (e.g., VM → VNet → NSG)
+- **Message Passing**: Nodes share information with neighbors through graph convolutions
+- **Context-Rich**: Learns from both node properties and graph structure
+- **Multi-Resource Patterns**: Can detect issues that span multiple resources
+
+### Components
+
+#### 1. Graph Feature Extractor (`crux/ml/graph_features.py`)
+
+Converts NetworkX dependency graphs to numerical node feature matrices:
+- Encodes resource types as categorical features
+- Extracts and flattens nested properties from resource configs
+- Converts boolean/string/numeric values to floats
+- Handles variable-length property sets gracefully
+
+```python
+from crux.ml.graph_features import GraphFeatureExtractor
+
+# Create feature extractor
+extractor = GraphFeatureExtractor(max_features=50)
+
+# Fit on training graphs
+extractor.fit(train_graphs)
+
+# Transform a graph to feature matrix
+X, node_to_idx = extractor.transform(graph)
+# X is (num_nodes, num_features) numpy array
+```
+
+#### 2. Graph Dataset Loader (`crux/ml/graph_loader.py`)
+
+Loads dependency graphs from CRUX datasets and prepares PyTorch Geometric Data objects:
+- Reads graphs from `dataset/*/graphs/*.json` files
+- Aligns graph nodes with labels from `labels.json`
+- Builds edge indices in COO format for PyTorch Geometric
+- Splits graphs into train/validation/test sets
+
+```python
+from crux.ml.graph_loader import GraphDatasetLoader
+
+loader = GraphDatasetLoader("dataset/exp-20240101-120000")
+train_data, val_data, test_data, feature_extractor, label_names = loader.load_and_prepare()
+```
+
+#### 3. GNN Models (`crux/ml/graph_models.py`)
+
+Three state-of-the-art GNN architectures for multi-label node classification:
+
+**GCN (Graph Convolutional Network):**
+- Simple and effective graph convolutions
+- Aggregates neighbor features via mean pooling
+- Fast training and inference
+
+**GAT (Graph Attention Network):**
+- Uses attention mechanisms to weight neighbor contributions
+- Learns which neighbors are most important
+- Multiple attention heads for richer representations
+
+**GraphSAGE:**
+- Sampling-based approach for scalable graph learning
+- Supports mean, max, or add aggregation
+- Works well on large graphs
+
+```python
+from crux.ml.graph_models import GCNModel, GATModel, GraphSAGEModel
+
+# Create GCN model
+model = GCNModel(
+    in_channels=50,        # Number of node features
+    hidden_channels=64,     # Hidden layer size
+    out_channels=37,        # Number of labels
+    num_layers=2,
+    dropout=0.5,
+)
+
+# Create GAT model with attention
+model = GATModel(
+    in_channels=50,
+    hidden_channels=32,
+    out_channels=37,
+    num_layers=2,
+    heads=4,               # Attention heads
+    dropout=0.5,
+)
+
+# Create GraphSAGE model
+model = GraphSAGEModel(
+    in_channels=50,
+    hidden_channels=64,
+    out_channels=37,
+    num_layers=2,
+    aggr="mean",          # Aggregation method
+)
+```
+
+#### 4. GNN Trainer (`crux/ml/graph_trainer.py`)
+
+Handles training loop with early stopping and evaluation:
+- Automatic device selection (GPU if available, else CPU)
+- Early stopping based on validation F1 score
+- Binary cross-entropy loss for multi-label classification
+- Training history tracking
+
+```python
+from crux.ml.graph_trainer import GNNTrainer
+
+trainer = GNNTrainer(
+    model,
+    learning_rate=0.001,
+    weight_decay=5e-4,
+)
+
+# Train with early stopping
+history = trainer.train(
+    train_data,
+    val_data,
+    num_epochs=100,
+    patience=10,  # Stop if no improvement for 10 epochs
+)
+
+# Evaluate on test set
+test_loss, test_metrics = trainer.evaluate(test_data)
+
+# Make predictions
+y_pred, y_proba = trainer.predict(test_data)
+```
+
+### CLI Commands
+
+#### Train a GNN Model
+
+```bash
+# Train GCN on a dataset
+crux train-gnn \
+  --dataset dataset/exp-20240101-120000 \
+  --model gcn \
+  --output models \
+  --name my-gcn \
+  --hidden-channels 64 \
+  --num-layers 2 \
+  --epochs 100 \
+  --patience 10
+
+# Train GAT with attention
+crux train-gnn \
+  --dataset dataset/exp-20240101-120000 \
+  --model gat \
+  --output models \
+  --name my-gat \
+  --hidden-channels 32 \
+  --heads 4 \
+  --num-layers 2
+
+# Train GraphSAGE
+crux train-gnn \
+  --dataset dataset/exp-20240101-120000 \
+  --model graphsage \
+  --output models \
+  --name my-sage \
+  --hidden-channels 64 \
+  --num-layers 3
+```
+
+Output files:
+- `models/my-gcn.pt` - Trained model
+- `models/my-gcn_features.pkl` - Graph feature extractor
+- `models/my-gcn_metrics.json` - Test set evaluation metrics
+- `models/my-gcn_history.json` - Training history (loss, F1 per epoch)
+
+### Installation Requirements
+
+GNN functionality requires PyTorch and PyTorch Geometric:
+
+```bash
+# CPU version (for development/testing)
+pip install torch torchvision
+pip install torch-geometric
+
+# GPU version (for faster training)
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+pip install torch-geometric
+```
+
+**Note**: The GNN modules are optional. CRUX will work without PyTorch installed, but GNN training will not be available. The baseline models (Random Forest, XGBoost) do not require PyTorch.
+
+### Workflow Example
+
+```bash
+# 1. Generate a dataset with dependency graphs (Milestone 2)
+crux generate-dataset \
+  --templates templates/azure-quickstart-templates \
+  --rules rules/ \
+  --output dataset/ \
+  --name exp-gnn \
+  --limit 100
+
+# 2. Train baseline models for comparison (Milestone 3)
+crux train-model \
+  --dataset dataset/exp-gnn \
+  --model random-forest \
+  --output models \
+  --name rf-baseline
+
+# 3. Train GNN models (Milestone 4)
+crux train-gnn \
+  --dataset dataset/exp-gnn \
+  --model gcn \
+  --output models \
+  --name gcn-model
+
+crux train-gnn \
+  --dataset dataset/exp-gnn \
+  --model gat \
+  --output models \
+  --name gat-model
+
+# 4. Compare results
+# Check models/rf-baseline_metrics.json
+# Check models/gcn-model_metrics.json
+# Check models/gat-model_metrics.json
+```
+
+### Expected Performance
+
+GNNs typically outperform baseline models on:
+- **Cross-resource dependencies**: VM without NSG, VNet without DDoS protection
+- **Structural patterns**: Resources in same connected component
+- **Cascading misconfigurations**: One misconfigured resource affecting others
+
+Baseline models may perform better on:
+- **Simple single-resource rules**: Storage TLS version, encryption settings
+- **Independent properties**: Resource-level configurations without dependencies
+- **Small datasets**: GNNs need more data to learn graph patterns
+
+### Model Selection Guide
+
+**Use GCN when:**
+- You have clear dependency structures
+- Training speed is important
+- You want a simple, interpretable baseline GNN
+
+**Use GAT when:**
+- Some dependencies are more important than others
+- You want the model to learn attention weights
+- You have sufficient training data (GAT has more parameters)
+
+**Use GraphSAGE when:**
+- You have very large graphs
+- You want scalable inference
+- You need different aggregation strategies
+
+**Use Random Forest/XGBoost when:**
+- You don't have dependency graph data
+- You want fast training and inference
+- You need feature importance analysis
+- Resources are mostly independent
+
+### Hyperparameter Tuning
+
+Key hyperparameters for GNNs:
+
+- `--hidden-channels`: Size of hidden layers (32-128 typical)
+- `--num-layers`: Number of GNN layers (2-3 typical, deeper = more hops)
+- `--dropout`: Regularization (0.3-0.7, higher for more data)
+- `--lr`: Learning rate (0.001-0.01)
+- `--weight-decay`: L2 regularization (1e-5 to 1e-3)
+- `--patience`: Early stopping patience (10-20 epochs)
+- `--heads`: (GAT only) Number of attention heads (2-8)
+
+### Troubleshooting
+
+**"PyTorch Geometric not available"**
+- Install PyTorch and PyTorch Geometric (see Installation Requirements above)
+- GNN functionality is optional - baseline models will still work
+
+**"No graphs found in dataset"**
+- Ensure dataset was generated with graph export enabled
+- Check that `dataset/*/graphs/` directory exists and contains `*_graph.json` files
+
+**OOM (Out of Memory) errors**
+- Reduce `--hidden-channels` (e.g., 32 instead of 64)
+- Reduce `--num-layers`
+- Use GraphSAGE instead of GAT (fewer parameters)
+- Train on CPU with `--device cpu`
+
+**Poor model performance**
+- Increase dataset size (more templates)
+- Increase `--epochs` and `--patience`
+- Try different model architectures
+- Check that graphs have meaningful structure (not all disconnected nodes)
+
 ## Development Workflow
 
 ### Adding New Mutations
@@ -468,9 +767,9 @@ logger.error("Errors that prevent completion")
 
 - ✅ **Milestone 0**: Repository restructuring, devcontainer with Claude Code CLI
 - ✅ **Milestone 1**: Core infrastructure (templates, mutations, rules, dataset generator, CLI)
-- 🔄 **Milestone 2**: Large-scale dataset generation (1000+ templates)
-- 🔄 **Milestone 3**: ML validation (XGBoost, Random Forest baselines)
-- 🔄 **Milestone 4**: Graph analysis (GNN models for cross-resource patterns)
+- ✅ **Milestone 2**: Large-scale dataset generation with dependency graphs
+- ✅ **Milestone 3**: ML validation (XGBoost, Random Forest baselines)
+- ✅ **Milestone 4**: GNN models (GCN, GAT, GraphSAGE for graph-aware detection)
 
 ## Archive: Option A
 

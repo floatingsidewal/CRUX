@@ -303,6 +303,139 @@ def cmd_evaluate_model(args: argparse.Namespace) -> None:
     logger.info(f"  F1 Score (micro): {metrics['f1_micro']:.3f}")
 
 
+def cmd_train_gnn(args: argparse.Namespace) -> None:
+    """Train a Graph Neural Network model on dependency graphs."""
+    from datetime import datetime
+    import pickle
+
+    # Check if PyTorch Geometric is available
+    try:
+        from .ml import GNN_AVAILABLE
+        if not GNN_AVAILABLE:
+            raise ImportError
+        from .ml.graph_loader import GraphDatasetLoader
+        from .ml.graph_models import GCNModel, GATModel, GraphSAGEModel
+        from .ml.graph_trainer import GNNTrainer
+        from .ml.evaluation import ModelEvaluator
+    except ImportError:
+        logger.error("PyTorch Geometric is required for GNN training")
+        logger.info("Install with: pip install torch torch-geometric")
+        sys.exit(1)
+
+    logger.info(f"Training {args.model} GNN on dataset {args.dataset}")
+
+    # Load graphs and prepare data
+    loader = GraphDatasetLoader(args.dataset)
+    try:
+        train_data, val_data, test_data, feature_extractor, label_names = loader.load_and_prepare(
+            test_size=args.test_size,
+            val_size=args.val_size,
+            random_state=42,
+            max_features=args.max_features,
+        )
+    except Exception as e:
+        logger.error(f"Error loading graph data: {e}")
+        sys.exit(1)
+
+    num_features = feature_extractor.get_num_features()
+    num_labels = len(label_names)
+
+    logger.info(f"Loaded {len(train_data)} train, {len(val_data)} val, {len(test_data)} test graphs")
+    logger.info(f"Node features: {num_features}, Labels: {num_labels}")
+    logger.info(f"Label names: {', '.join(label_names[:5])}...")
+
+    # Create model
+    if args.model == "gcn":
+        model = GCNModel(
+            in_channels=num_features,
+            hidden_channels=args.hidden_channels,
+            out_channels=num_labels,
+            num_layers=args.num_layers,
+            dropout=args.dropout,
+        )
+    elif args.model == "gat":
+        model = GATModel(
+            in_channels=num_features,
+            hidden_channels=args.hidden_channels,
+            out_channels=num_labels,
+            num_layers=args.num_layers,
+            heads=args.heads,
+            dropout=args.dropout,
+        )
+    elif args.model == "graphsage":
+        model = GraphSAGEModel(
+            in_channels=num_features,
+            hidden_channels=args.hidden_channels,
+            out_channels=num_labels,
+            num_layers=args.num_layers,
+            dropout=args.dropout,
+        )
+    else:
+        logger.error(f"Unknown model type: {args.model}")
+        sys.exit(1)
+
+    # Store feature and label names in model
+    model.feature_names = feature_extractor.feature_names
+    model.label_names = label_names
+
+    # Create trainer
+    trainer = GNNTrainer(
+        model,
+        learning_rate=args.lr,
+        weight_decay=args.weight_decay,
+    )
+
+    # Train model
+    logger.info(f"\nTraining on device: {trainer.device}")
+    history = trainer.train(
+        train_data,
+        val_data,
+        num_epochs=args.epochs,
+        patience=args.patience,
+        verbose=True,
+    )
+
+    # Evaluate on test set
+    logger.info("\nTest set evaluation:")
+    test_loss, test_metrics = trainer.evaluate(test_data)
+    evaluator = ModelEvaluator(label_names)
+    evaluator.print_report(test_metrics)
+
+    # Save model
+    model_name = args.name or f"gnn-{args.model}-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+    output_dir = Path(args.output)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    model_path = output_dir / f"{model_name}.pt"
+    model.save(str(model_path))
+
+    # Save feature extractor
+    feature_path = output_dir / f"{model_name}_features.pkl"
+    with open(feature_path, "wb") as f:
+        pickle.dump(feature_extractor, f)
+
+    # Save metrics
+    import json
+    metrics_path = output_dir / f"{model_name}_metrics.json"
+    with open(metrics_path, "w") as f:
+        json.dump(test_metrics, f, indent=2)
+
+    # Save training history
+    history_path = output_dir / f"{model_name}_history.json"
+    with open(history_path, "w") as f:
+        json.dump(history, f, indent=2)
+
+    logger.info(f"\nSaved model to {model_path}")
+    logger.info(f"Saved feature extractor to {feature_path}")
+    logger.info(f"Saved metrics to {metrics_path}")
+    logger.info(f"Saved training history to {history_path}")
+
+    logger.info(f"\nTraining complete!")
+    logger.info(f"  Best Validation F1 Macro: {max(history['val_f1_macro']):.3f}")
+    logger.info(f"  Test F1 Macro: {test_metrics['f1_macro']:.3f}")
+    logger.info(f"  Test F1 Micro: {test_metrics['f1_micro']:.3f}")
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build the argument parser."""
     parser = argparse.ArgumentParser(
@@ -481,6 +614,99 @@ def build_parser() -> argparse.ArgumentParser:
         help="Evaluate on test set only (default: all data)",
     )
     evaluate_parser.set_defaults(func=cmd_evaluate_model)
+
+    # train-gnn command
+    gnn_parser = subparsers.add_parser(
+        "train-gnn",
+        help="Train a Graph Neural Network model on dependency graphs",
+    )
+    gnn_parser.add_argument(
+        "--dataset",
+        required=True,
+        help="Path to dataset directory (must contain graphs/)",
+    )
+    gnn_parser.add_argument(
+        "--model",
+        choices=["gcn", "gat", "graphsage"],
+        default="gcn",
+        help="GNN model type to train (default: gcn)",
+    )
+    gnn_parser.add_argument(
+        "--output",
+        default="models",
+        help="Output directory for trained model",
+    )
+    gnn_parser.add_argument(
+        "--name",
+        help="Model name (default: gnn-MODEL-YYYYMMDD-HHMMSS)",
+    )
+    gnn_parser.add_argument(
+        "--test-size",
+        type=float,
+        default=0.2,
+        help="Proportion of graphs for test set (default: 0.2)",
+    )
+    gnn_parser.add_argument(
+        "--val-size",
+        type=float,
+        default=0.1,
+        help="Proportion of training graphs for validation (default: 0.1)",
+    )
+    gnn_parser.add_argument(
+        "--max-features",
+        type=int,
+        default=50,
+        help="Maximum number of node features (default: 50)",
+    )
+    gnn_parser.add_argument(
+        "--hidden-channels",
+        type=int,
+        default=64,
+        help="Number of hidden channels (default: 64)",
+    )
+    gnn_parser.add_argument(
+        "--num-layers",
+        type=int,
+        default=2,
+        help="Number of GNN layers (default: 2)",
+    )
+    gnn_parser.add_argument(
+        "--heads",
+        type=int,
+        default=4,
+        help="Number of attention heads for GAT (default: 4)",
+    )
+    gnn_parser.add_argument(
+        "--dropout",
+        type=float,
+        default=0.5,
+        help="Dropout probability (default: 0.5)",
+    )
+    gnn_parser.add_argument(
+        "--lr",
+        type=float,
+        default=0.001,
+        help="Learning rate (default: 0.001)",
+    )
+    gnn_parser.add_argument(
+        "--weight-decay",
+        type=float,
+        default=5e-4,
+        help="L2 regularization weight (default: 5e-4)",
+    )
+    gnn_parser.add_argument(
+        "--epochs",
+        type=int,
+        default=100,
+        help="Maximum number of training epochs (default: 100)",
+    )
+    gnn_parser.add_argument(
+        "--patience",
+        type=int,
+        default=10,
+        help="Early stopping patience in epochs (default: 10)",
+    )
+    gnn_parser.set_defaults(func=cmd_train_gnn)
 
     return parser
 
