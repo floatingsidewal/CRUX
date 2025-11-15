@@ -770,6 +770,23 @@ logger.error("Errors that prevent completion")
 - ✅ **Milestone 2**: Large-scale dataset generation with dependency graphs
 - ✅ **Milestone 3**: ML validation (XGBoost, Random Forest baselines)
 - ✅ **Milestone 4**: GNN models (GCN, GAT, GraphSAGE for graph-aware detection)
+- ✅ **Milestone 4.1**: Large-scale dataset enhancement (6K+ samples, 26.6x increase)
+
+### Milestone 4.1 Highlights
+
+**Dataset Enhancement Results:**
+- Templates processed: 97 → 358 (3.7x)
+- Mutated resources: 228 → 6,072 (26.6x)
+- Total labels: 1,268 → 45,512 (35.9x)
+- Rare labels reduced: 66.7% → 2.0% (only 1 rare label remaining)
+
+**Model Performance Improvements:**
+- Random Forest F1 Macro: 0.672 → 0.757 (+12.6%)
+- XGBoost F1 Macro: 0.358 → 0.762 (+112.8% 🚀)
+- XGBoost now competitive with Random Forest
+- Exact match ratio: 54.3% → 64.4-65.7%
+
+See `MILESTONE-4.1-RESULTS.md` for detailed analysis and comparisons.
 
 ## Archive: Option A
 
