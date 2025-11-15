@@ -211,8 +211,10 @@ marimo/_lsp/
 __marimo__/
 
 # CRUX datasets and build outputs (root level only)
-/dataset/
+/dataset/*
+!/dataset/sample/
 /templates/
+/models/
 out/
 .DS_Store
 *.json.compiled

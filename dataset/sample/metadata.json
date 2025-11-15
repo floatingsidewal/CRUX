@@ -1,0 +1,547 @@
+{
+  "experiment_name": "sample",
+  "timestamp": "2025-11-15T12:53:57.605439",
+  "mutations": [
+    {
+      "id": "storage_public_blob_access",
+      "target_type": "Microsoft.Storage/storageAccounts",
+      "description": "Enable public blob access on storage account",
+      "severity": "high",
+      "labels": [
+        "Storage_PublicAccess",
+        "CIS_3.7"
+      ]
+    },
+    {
+      "id": "storage_weak_tls",
+      "target_type": "Microsoft.Storage/storageAccounts",
+      "description": "Set minimum TLS version to 1.0 (weak)",
+      "severity": "medium",
+      "labels": [
+        "Storage_WeakTLS",
+        "CIS_3.8"
+      ]
+    },
+    {
+      "id": "storage_http_allowed",
+      "target_type": "Microsoft.Storage/storageAccounts",
+      "description": "Allow HTTP traffic (not HTTPS-only)",
+      "severity": "high",
+      "labels": [
+        "Storage_HTTPAllowed",
+        "CIS_3.1"
+      ]
+    },
+    {
+      "id": "storage_open_firewall",
+      "target_type": "Microsoft.Storage/storageAccounts",
+      "description": "Set firewall to allow all network traffic",
+      "severity": "high",
+      "labels": [
+        "Storage_FirewallOpen",
+        "CIS_3.6"
+      ]
+    },
+    {
+      "id": "storage_insecure_transfer",
+      "target_type": "Microsoft.Storage/storageAccounts",
+      "description": "Disable secure transfer requirement",
+      "severity": "critical",
+      "labels": [
+        "Storage_InsecureTransfer",
+        "CIS_3.1"
+      ]
+    },
+    {
+      "id": "storage_no_blob_versioning",
+      "target_type": "Microsoft.Storage/storageAccounts",
+      "description": "Disable blob versioning",
+      "severity": "low",
+      "labels": [
+        "Storage_NoVersioning"
+      ]
+    },
+    {
+      "id": "storage_no_soft_delete",
+      "target_type": "Microsoft.Storage/storageAccounts",
+      "description": "Disable blob soft delete",
+      "severity": "medium",
+      "labels": [
+        "Storage_NoSoftDelete",
+        "CIS_3.10"
+      ]
+    },
+    {
+      "id": "storage_allow_shared_key",
+      "target_type": "Microsoft.Storage/storageAccounts",
+      "description": "Allow shared key access (not just Azure AD)",
+      "severity": "medium",
+      "labels": [
+        "Storage_SharedKeyAccess"
+      ]
+    },
+    {
+      "id": "storage_no_infrastructure_encryption",
+      "target_type": "Microsoft.Storage/storageAccounts",
+      "description": "Disable infrastructure encryption",
+      "severity": "medium",
+      "labels": [
+        "Storage_NoInfraEncryption"
+      ]
+    },
+    {
+      "id": "storage_cross_tenant_replication",
+      "target_type": "Microsoft.Storage/storageAccounts",
+      "description": "Allow cross-tenant replication",
+      "severity": "low",
+      "labels": [
+        "Storage_CrossTenantReplication"
+      ]
+    },
+    {
+      "id": "vm_no_encryption",
+      "target_type": "Microsoft.Compute/virtualMachines",
+      "description": "Disable VM disk encryption",
+      "severity": "critical",
+      "labels": [
+        "VM_NoEncryption",
+        "CIS_7.1"
+      ]
+    },
+    {
+      "id": "vm_no_managed_disk_encryption",
+      "target_type": "Microsoft.Compute/virtualMachines",
+      "description": "Disable managed disk encryption at rest",
+      "severity": "high",
+      "labels": [
+        "VM_NoManagedDiskEncryption"
+      ]
+    },
+    {
+      "id": "vm_allow_password_auth",
+      "target_type": "Microsoft.Compute/virtualMachines",
+      "description": "Allow password authentication for SSH",
+      "severity": "high",
+      "labels": [
+        "VM_PasswordAuthEnabled",
+        "CIS_7.2"
+      ]
+    },
+    {
+      "id": "vm_no_boot_diagnostics",
+      "target_type": "Microsoft.Compute/virtualMachines",
+      "description": "Disable boot diagnostics",
+      "severity": "medium",
+      "labels": [
+        "VM_NoBootDiagnostics"
+      ]
+    },
+    {
+      "id": "vm_no_auto_patching",
+      "target_type": "Microsoft.Compute/virtualMachines",
+      "description": "Disable automatic OS patching",
+      "severity": "medium",
+      "labels": [
+        "VM_NoAutoPatch"
+      ]
+    },
+    {
+      "id": "vm_insecure_size",
+      "target_type": "Microsoft.Compute/virtualMachines",
+      "description": "Use outdated VM size without security features",
+      "severity": "low",
+      "labels": [
+        "VM_OutdatedSize"
+      ]
+    },
+    {
+      "id": "vm_no_monitoring",
+      "target_type": "Microsoft.Compute/virtualMachines",
+      "description": "Disable VM monitoring and diagnostics",
+      "severity": "medium",
+      "labels": [
+        "VM_NoMonitoring"
+      ]
+    },
+    {
+      "id": "vm_unmanaged_disk",
+      "target_type": "Microsoft.Compute/virtualMachines",
+      "description": "Use unmanaged disks instead of managed disks",
+      "severity": "medium",
+      "labels": [
+        "VM_UnmanagedDisk"
+      ]
+    },
+    {
+      "id": "vm_no_secure_boot",
+      "target_type": "Microsoft.Compute/virtualMachines",
+      "description": "Disable secure boot feature",
+      "severity": "high",
+      "labels": [
+        "VM_NoSecureBoot",
+        "CIS_7.5"
+      ]
+    },
+    {
+      "id": "vm_no_vtpm",
+      "target_type": "Microsoft.Compute/virtualMachines",
+      "description": "Disable virtual TPM",
+      "severity": "high",
+      "labels": [
+        "VM_NoVTPM"
+      ]
+    },
+    {
+      "id": "vm_no_availability",
+      "target_type": "Microsoft.Compute/virtualMachines",
+      "description": "No availability set configured",
+      "severity": "low",
+      "labels": [
+        "VM_NoAvailability"
+      ]
+    },
+    {
+      "id": "vm_no_identity",
+      "target_type": "Microsoft.Compute/virtualMachines",
+      "description": "No managed identity configured",
+      "severity": "medium",
+      "labels": [
+        "VM_NoManagedIdentity"
+      ]
+    },
+    {
+      "id": "nsg_allow_all_inbound",
+      "target_type": "Microsoft.Network/networkSecurityGroups",
+      "description": "Allow all inbound traffic",
+      "severity": "critical",
+      "labels": [
+        "NSG_AllowAllInbound",
+        "CIS_6.1"
+      ]
+    },
+    {
+      "id": "nsg_open_ssh",
+      "target_type": "Microsoft.Network/networkSecurityGroups",
+      "description": "Allow SSH from internet",
+      "severity": "critical",
+      "labels": [
+        "NSG_OpenSSH",
+        "CIS_6.2"
+      ]
+    },
+    {
+      "id": "nsg_open_rdp",
+      "target_type": "Microsoft.Network/networkSecurityGroups",
+      "description": "Allow RDP from internet",
+      "severity": "critical",
+      "labels": [
+        "NSG_OpenRDP",
+        "CIS_6.3"
+      ]
+    },
+    {
+      "id": "nsg_open_database",
+      "target_type": "Microsoft.Network/networkSecurityGroups",
+      "description": "Allow database ports from internet",
+      "severity": "critical",
+      "labels": [
+        "NSG_OpenDatabase",
+        "CIS_6.4"
+      ]
+    },
+    {
+      "id": "nsg_no_default_deny",
+      "target_type": "Microsoft.Network/networkSecurityGroups",
+      "description": "No default deny rule configured",
+      "severity": "high",
+      "labels": [
+        "NSG_NoDefaultDeny"
+      ]
+    },
+    {
+      "id": "nsg_allow_ftp",
+      "target_type": "Microsoft.Network/networkSecurityGroups",
+      "description": "Allow FTP from internet",
+      "severity": "high",
+      "labels": [
+        "NSG_OpenFTP"
+      ]
+    },
+    {
+      "id": "vnet_no_ddos",
+      "target_type": "Microsoft.Network/virtualNetworks",
+      "description": "Disable DDoS protection",
+      "severity": "high",
+      "labels": [
+        "VNet_NoDDoSProtection",
+        "CIS_6.5"
+      ]
+    },
+    {
+      "id": "vnet_no_vm_protection",
+      "target_type": "Microsoft.Network/virtualNetworks",
+      "description": "Disable VM protection",
+      "severity": "medium",
+      "labels": [
+        "VNet_NoVMProtection"
+      ]
+    },
+    {
+      "id": "vnet_no_service_endpoints",
+      "target_type": "Microsoft.Network/virtualNetworks",
+      "description": "Remove service endpoints from subnets",
+      "severity": "medium",
+      "labels": [
+        "VNet_NoServiceEndpoints"
+      ]
+    },
+    {
+      "id": "vnet_broad_address_space",
+      "target_type": "Microsoft.Network/virtualNetworks",
+      "description": "Use overly broad network address space",
+      "severity": "low",
+      "labels": [
+        "VNet_BroadAddressSpace"
+      ]
+    },
+    {
+      "id": "vnet_subnet_no_nsg",
+      "target_type": "Microsoft.Network/virtualNetworks",
+      "description": "No NSG configured on subnets",
+      "severity": "high",
+      "labels": [
+        "VNet_SubnetNoNSG",
+        "CIS_6.6"
+      ]
+    },
+    {
+      "id": "vnet_no_bgp",
+      "target_type": "Microsoft.Network/virtualNetworks",
+      "description": "Disable BGP route propagation",
+      "severity": "low",
+      "labels": [
+        "VNet_NoBGP"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "vm-no-disk-encryption",
+      "resource_type": "Microsoft.Compute/virtualMachines",
+      "severity": "critical"
+    },
+    {
+      "id": "vm-no-managed-disk-encryption",
+      "resource_type": "Microsoft.Compute/virtualMachines",
+      "severity": "high"
+    },
+    {
+      "id": "vm-password-auth-enabled",
+      "resource_type": "Microsoft.Compute/virtualMachines",
+      "severity": "high"
+    },
+    {
+      "id": "vm-no-boot-diagnostics",
+      "resource_type": "Microsoft.Compute/virtualMachines",
+      "severity": "medium"
+    },
+    {
+      "id": "vm-boot-diagnostics-missing",
+      "resource_type": "Microsoft.Compute/virtualMachines",
+      "severity": "medium"
+    },
+    {
+      "id": "vm-manual-patching",
+      "resource_type": "Microsoft.Compute/virtualMachines",
+      "severity": "medium"
+    },
+    {
+      "id": "vm-no-secure-boot",
+      "resource_type": "Microsoft.Compute/virtualMachines",
+      "severity": "high"
+    },
+    {
+      "id": "vm-no-vtpm",
+      "resource_type": "Microsoft.Compute/virtualMachines",
+      "severity": "high"
+    },
+    {
+      "id": "vm-unmanaged-disk",
+      "resource_type": "Microsoft.Compute/virtualMachines",
+      "severity": "medium"
+    },
+    {
+      "id": "vm-no-managed-identity",
+      "resource_type": "Microsoft.Compute/virtualMachines",
+      "severity": "medium"
+    },
+    {
+      "id": "vm-identity-disabled",
+      "resource_type": "Microsoft.Compute/virtualMachines",
+      "severity": "medium"
+    },
+    {
+      "id": "vm-no-availability-set",
+      "resource_type": "Microsoft.Compute/virtualMachines",
+      "severity": "low"
+    },
+    {
+      "id": "vm-outdated-size",
+      "resource_type": "Microsoft.Compute/virtualMachines",
+      "severity": "low"
+    },
+    {
+      "id": "storage-public-blob-access",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "high"
+    },
+    {
+      "id": "storage-weak-tls",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "medium"
+    },
+    {
+      "id": "storage-http-allowed",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "high"
+    },
+    {
+      "id": "storage-firewall-open",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "high"
+    },
+    {
+      "id": "storage-no-soft-delete",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "medium"
+    },
+    {
+      "id": "storage-shared-key-access",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "medium"
+    },
+    {
+      "id": "storage-no-versioning",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "low"
+    },
+    {
+      "id": "storage-no-infrastructure-encryption",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "medium"
+    },
+    {
+      "id": "storage-cross-tenant-replication",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "low"
+    },
+    {
+      "id": "storage-logging-disabled",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "low"
+    },
+    {
+      "id": "storage-no-encryption",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "critical"
+    },
+    {
+      "id": "storage-default-no-encryption",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "medium"
+    },
+    {
+      "id": "nsg-allow-all-inbound",
+      "resource_type": "Microsoft.Network/networkSecurityGroups",
+      "severity": "critical"
+    },
+    {
+      "id": "nsg-open-ssh",
+      "resource_type": "Microsoft.Network/networkSecurityGroups",
+      "severity": "critical"
+    },
+    {
+      "id": "nsg-open-rdp",
+      "resource_type": "Microsoft.Network/networkSecurityGroups",
+      "severity": "critical"
+    },
+    {
+      "id": "nsg-open-database",
+      "resource_type": "Microsoft.Network/networkSecurityGroups",
+      "severity": "critical"
+    },
+    {
+      "id": "nsg-open-ftp",
+      "resource_type": "Microsoft.Network/networkSecurityGroups",
+      "severity": "high"
+    },
+    {
+      "id": "nsg-no-deny-rules",
+      "resource_type": "Microsoft.Network/networkSecurityGroups",
+      "severity": "high"
+    },
+    {
+      "id": "nsg-empty-rules",
+      "resource_type": "Microsoft.Network/networkSecurityGroups",
+      "severity": "medium"
+    },
+    {
+      "id": "vnet-no-ddos-protection",
+      "resource_type": "Microsoft.Network/virtualNetworks",
+      "severity": "high"
+    },
+    {
+      "id": "vnet-ddos-not-configured",
+      "resource_type": "Microsoft.Network/virtualNetworks",
+      "severity": "high"
+    },
+    {
+      "id": "vnet-no-vm-protection",
+      "resource_type": "Microsoft.Network/virtualNetworks",
+      "severity": "medium"
+    },
+    {
+      "id": "vnet-vm-protection-not-configured",
+      "resource_type": "Microsoft.Network/virtualNetworks",
+      "severity": "medium"
+    },
+    {
+      "id": "vnet-subnet-no-nsg",
+      "resource_type": "Microsoft.Network/virtualNetworks",
+      "severity": "high"
+    },
+    {
+      "id": "vnet-no-service-endpoints",
+      "resource_type": "Microsoft.Network/virtualNetworks",
+      "severity": "medium"
+    },
+    {
+      "id": "vnet-broad-address-space",
+      "resource_type": "Microsoft.Network/virtualNetworks",
+      "severity": "low"
+    },
+    {
+      "id": "vnet-bgp-disabled",
+      "resource_type": "Microsoft.Network/virtualNetworks",
+      "severity": "low"
+    },
+    {
+      "id": "vnet-no-subnets",
+      "resource_type": "Microsoft.Network/virtualNetworks",
+      "severity": "medium"
+    },
+    {
+      "id": "vnet-missing-address-space",
+      "resource_type": "Microsoft.Network/virtualNetworks",
+      "severity": "critical"
+    }
+  ],
+  "statistics": {
+    "templates_processed": 5,
+    "templates_failed": 0,
+    "baseline_resources": 20,
+    "mutated_resources": 10,
+    "mutations_applied": 10,
+    "labels_generated": 47
+  }
+}

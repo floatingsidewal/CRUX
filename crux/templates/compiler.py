@@ -17,9 +17,19 @@ logger = logging.getLogger(__name__)
 class BicepCompiler:
     """Compiles Bicep templates to ARM JSON."""
 
-    def __init__(self):
-        """Initialize the Bicep compiler and verify installation."""
-        self._verify_bicep_installation()
+    def __init__(self, verify_installation: bool = True):
+        """
+        Initialize the Bicep compiler.
+
+        Args:
+            verify_installation: Whether to verify Azure CLI/Bicep installation on init
+        """
+        self._bicep_verified = False
+        if verify_installation:
+            try:
+                self._verify_bicep_installation()
+            except RuntimeError as e:
+                logger.warning(f"Bicep CLI not available: {e}. Will use ARM JSON templates only.")
 
     def _verify_bicep_installation(self) -> None:
         """Verify that Bicep CLI is installed and available."""
@@ -31,6 +41,7 @@ class BicepCompiler:
                 check=True,
             )
             logger.debug(f"Bicep CLI version: {result.stdout.strip()}")
+            self._bicep_verified = True
         except (subprocess.CalledProcessError, FileNotFoundError) as e:
             raise RuntimeError(
                 "Bicep CLI not found or not working. "
@@ -59,6 +70,10 @@ class BicepCompiler:
         """
         if not bicep_file.exists():
             raise FileNotFoundError(f"Bicep file not found: {bicep_file}")
+
+        # Ensure Bicep CLI is available before attempting to compile
+        if not self._bicep_verified:
+            self._verify_bicep_installation()
 
         logger.info(f"Compiling {bicep_file}...")
 
