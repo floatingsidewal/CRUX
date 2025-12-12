@@ -1,0 +1,160 @@
+# App Service / Web App Security Rules
+# Based on CIS Microsoft Azure Foundations Benchmark v2.0.0
+# and OWASP best practices
+
+rules:
+  - id: webapp-http-only
+    name: "Web App HTTP Allowed"
+    description: "Web App allows unencrypted HTTP traffic"
+    resource_type: Microsoft.Web/sites
+    severity: high
+    cis_reference: "9.2"
+    condition:
+      property: properties.httpsOnly
+      equals: false
+    labels:
+      - WebApp_HTTPOnly
+      - CIS_9.2
+
+  - id: webapp-weak-tls
+    name: "Web App Weak TLS Version"
+    description: "Web App allows TLS 1.0 or 1.1"
+    resource_type: Microsoft.Web/sites
+    severity: high
+    cis_reference: "9.3"
+    condition:
+      property: properties.siteConfig.minTlsVersion
+      not_in:
+        - "1.2"
+        - "1.3"
+    labels:
+      - WebApp_WeakTLS
+      - CIS_9.3
+
+  - id: webapp-remote-debugging
+    name: "Web App Remote Debugging Enabled"
+    description: "Web App has remote debugging enabled (security risk)"
+    resource_type: Microsoft.Web/sites
+    severity: critical
+    cis_reference: "9.7"
+    condition:
+      property: properties.siteConfig.remoteDebuggingEnabled
+      equals: true
+    labels:
+      - WebApp_RemoteDebugging
+      - CIS_9.7
+
+  - id: webapp-ftp-enabled
+    name: "Web App FTP Enabled"
+    description: "Web App allows FTP deployment (cleartext credentials)"
+    resource_type: Microsoft.Web/sites
+    severity: high
+    cis_reference: "9.4"
+    condition:
+      property: properties.siteConfig.ftpsState
+      in:
+        - AllAllowed
+        - FtpsOnly
+    labels:
+      - WebApp_FTPEnabled
+      - CIS_9.4
+
+  - id: webapp-no-managed-identity
+    name: "Web App No Managed Identity"
+    description: "Web App does not use managed identity"
+    resource_type: Microsoft.Web/sites
+    severity: medium
+    cis_reference: "9.5"
+    condition:
+      property: identity
+      is_empty: true
+    labels:
+      - WebApp_NoManagedIdentity
+      - CIS_9.5
+
+  - id: webapp-no-client-cert
+    name: "Web App Client Certificate Disabled"
+    description: "Web App does not require client certificates"
+    resource_type: Microsoft.Web/sites
+    severity: medium
+    cis_reference: "9.6"
+    condition:
+      property: properties.clientCertEnabled
+      equals: false
+    labels:
+      - WebApp_NoClientCert
+      - CIS_9.6
+
+  - id: webapp-public-network
+    name: "Web App Public Network Access"
+    description: "Web App allows public network access without restrictions"
+    resource_type: Microsoft.Web/sites
+    severity: medium
+    condition:
+      all:
+        - property: properties.publicNetworkAccess
+          equals: Enabled
+        - property: properties.siteConfig.ipSecurityRestrictions
+          is_empty: true
+    labels:
+      - WebApp_PublicNetwork
+
+  - id: webapp-no-https-redirect
+    name: "Web App No HTTPS Redirect"
+    description: "Web App does not redirect HTTP to HTTPS"
+    resource_type: Microsoft.Web/sites
+    severity: medium
+    condition:
+      property: properties.siteConfig.httpLoggingEnabled
+      equals: false
+    labels:
+      - WebApp_NoHTTPSRedirect
+
+  - id: webapp-http20-misconfigured
+    name: "Web App HTTP/2 Misconfigured"
+    description: "Web App has HTTP/2 enabled with weak TLS"
+    resource_type: Microsoft.Web/sites
+    severity: medium
+    condition:
+      all:
+        - property: properties.siteConfig.http20Enabled
+          equals: true
+        - property: properties.siteConfig.minTlsVersion
+          equals: "1.0"
+    labels:
+      - WebApp_HTTP20Misconfigured
+
+  - id: webapp-always-on-disabled
+    name: "Web App Always On Disabled"
+    description: "Web App Always On is disabled (cold start vulnerability)"
+    resource_type: Microsoft.Web/sites
+    severity: low
+    condition:
+      property: properties.siteConfig.alwaysOn
+      equals: false
+    labels:
+      - WebApp_AlwaysOnDisabled
+
+  - id: webapp-no-auth
+    name: "Web App Authentication Disabled"
+    description: "Web App does not have authentication enabled"
+    resource_type: Microsoft.Web/sites
+    severity: high
+    cis_reference: "9.1"
+    condition:
+      property: properties.siteConfig.authEnabled
+      equals: false
+    labels:
+      - WebApp_NoAuth
+      - CIS_9.1
+
+  - id: webapp-32bit-worker
+    name: "Web App 32-bit Worker Process"
+    description: "Web App uses 32-bit worker process (memory limited)"
+    resource_type: Microsoft.Web/sites
+    severity: low
+    condition:
+      property: properties.siteConfig.use32BitWorkerProcess
+      equals: true
+    labels:
+      - WebApp_32BitWorker

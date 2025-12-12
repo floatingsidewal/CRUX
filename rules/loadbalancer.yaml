@@ -1,0 +1,149 @@
+# Load Balancer and Public IP Security Rules
+# Based on Azure networking best practices
+# and CIS Microsoft Azure Foundations Benchmark v2.0.0
+
+rules:
+  # ========== Public IP Rules ==========
+  - id: pip-basic-sku
+    name: "Public IP Basic SKU"
+    description: "Public IP uses Basic SKU (no DDoS protection or zone redundancy)"
+    resource_type: Microsoft.Network/publicIPAddresses
+    severity: high
+    cis_reference: "6.7"
+    condition:
+      property: sku.name
+      equals: Basic
+    labels:
+      - PIP_BasicSKU
+      - CIS_6.7
+
+  - id: pip-dynamic-allocation
+    name: "Public IP Dynamic Allocation"
+    description: "Public IP uses dynamic allocation (IP changes on restart)"
+    resource_type: Microsoft.Network/publicIPAddresses
+    severity: low
+    condition:
+      property: properties.publicIPAllocationMethod
+      equals: Dynamic
+    labels:
+      - PIP_DynamicAllocation
+
+  - id: pip-no-ddos
+    name: "Public IP No DDoS Protection"
+    description: "Public IP has no DDoS protection plan"
+    resource_type: Microsoft.Network/publicIPAddresses
+    severity: high
+    cis_reference: "6.8"
+    condition:
+      property: properties.ddosSettings
+      is_empty: true
+    labels:
+      - PIP_NoDDoS
+      - CIS_6.8
+
+  - id: pip-ipv4-only
+    name: "Public IP IPv4 Only"
+    description: "Public IP supports only IPv4"
+    resource_type: Microsoft.Network/publicIPAddresses
+    severity: low
+    condition:
+      property: properties.publicIPAddressVersion
+      equals: IPv4
+    labels:
+      - PIP_IPv4Only
+
+  - id: pip-short-timeout
+    name: "Public IP Short Idle Timeout"
+    description: "Public IP has short idle timeout (may cause connection drops)"
+    resource_type: Microsoft.Network/publicIPAddresses
+    severity: low
+    condition:
+      property: properties.idleTimeoutInMinutes
+      less_than: 10
+    labels:
+      - PIP_ShortTimeout
+
+  # ========== Load Balancer Rules ==========
+  - id: lb-basic-sku
+    name: "Load Balancer Basic SKU"
+    description: "Load Balancer uses Basic SKU (no availability zones)"
+    resource_type: Microsoft.Network/loadBalancers
+    severity: medium
+    condition:
+      property: sku.name
+      equals: Basic
+    labels:
+      - LB_BasicSKU
+
+  - id: lb-no-health-probes
+    name: "Load Balancer No Health Probes"
+    description: "Load Balancer has no health probes configured"
+    resource_type: Microsoft.Network/loadBalancers
+    severity: high
+    condition:
+      property: properties.probes
+      is_empty: true
+    labels:
+      - LB_NoHealthProbes
+
+  - id: lb-open-management
+    name: "Load Balancer Open Management Ports"
+    description: "Load Balancer exposes management ports (RDP/SSH) publicly"
+    resource_type: Microsoft.Network/loadBalancers
+    severity: critical
+    cis_reference: "6.9"
+    condition:
+      property: properties.inboundNatRules
+      contains_any:
+        - properties.backendPort: 3389
+        - properties.backendPort: 22
+    labels:
+      - LB_OpenManagement
+      - CIS_6.9
+
+  - id: lb-no-outbound-rules
+    name: "Load Balancer No Outbound Rules"
+    description: "Load Balancer has no outbound rules (port exhaustion risk)"
+    resource_type: Microsoft.Network/loadBalancers
+    severity: medium
+    condition:
+      property: properties.outboundRules
+      is_empty: true
+    labels:
+      - LB_NoOutboundRules
+
+  - id: lb-no-tcp-reset
+    name: "Load Balancer TCP Reset Disabled"
+    description: "Load Balancer does not send TCP reset on idle timeout"
+    resource_type: Microsoft.Network/loadBalancers
+    severity: low
+    condition:
+      property: properties.loadBalancingRules
+      contains:
+        properties.enableTcpReset: false
+    labels:
+      - LB_NoTCPReset
+
+  - id: lb-floating-ip
+    name: "Load Balancer Floating IP Enabled"
+    description: "Load Balancer has floating IP enabled (DSR mode)"
+    resource_type: Microsoft.Network/loadBalancers
+    severity: low
+    condition:
+      property: properties.loadBalancingRules
+      contains:
+        properties.enableFloatingIP: true
+    labels:
+      - LB_FloatingIP
+
+  - id: lb-all-ports
+    name: "Load Balancer All Ports Rule"
+    description: "Load Balancer forwards all ports to backend (HA Ports)"
+    resource_type: Microsoft.Network/loadBalancers
+    severity: medium
+    condition:
+      property: properties.loadBalancingRules
+      contains:
+        properties.frontendPort: 0
+    labels:
+      - LB_AllPorts

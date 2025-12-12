@@ -1,0 +1,163 @@
+# Database Security Rules (Cosmos DB and SQL Server)
+# Based on CIS Microsoft Azure Foundations Benchmark v2.0.0
+# and database security best practices
+
+rules:
+  # ========== Cosmos DB Rules ==========
+  - id: cosmosdb-public-access
+    name: "Cosmos DB Public Network Access"
+    description: "Cosmos DB allows public network access"
+    resource_type: Microsoft.DocumentDB/databaseAccounts
+    severity: critical
+    cis_reference: "5.1"
+    condition:
+      property: properties.publicNetworkAccess
+      equals: Enabled
+    labels:
+      - CosmosDB_PublicAccess
+      - CIS_5.1
+
+  - id: cosmosdb-local-auth
+    name: "Cosmos DB Local Authentication Enabled"
+    description: "Cosmos DB allows key-based authentication instead of Azure AD"
+    resource_type: Microsoft.DocumentDB/databaseAccounts
+    severity: medium
+    cis_reference: "5.2"
+    condition:
+      property: properties.disableLocalAuth
+      equals: false
+    labels:
+      - CosmosDB_LocalAuth
+      - CIS_5.2
+
+  - id: cosmosdb-no-failover
+    name: "Cosmos DB Automatic Failover Disabled"
+    description: "Cosmos DB automatic failover is disabled"
+    resource_type: Microsoft.DocumentDB/databaseAccounts
+    severity: medium
+    condition:
+      property: properties.enableAutomaticFailover
+      equals: false
+    labels:
+      - CosmosDB_NoFailover
+
+  - id: cosmosdb-allow-all-azure
+    name: "Cosmos DB Allow All Azure Services"
+    description: "Cosmos DB allows access from all Azure datacenters"
+    resource_type: Microsoft.DocumentDB/databaseAccounts
+    severity: high
+    cis_reference: "5.3"
+    condition:
+      property: properties.ipRules
+      contains:
+        ipAddressOrRange: "0.0.0.0"
+    labels:
+      - CosmosDB_AllowAllAzure
+      - CIS_5.3
+
+  - id: cosmosdb-no-cmk
+    name: "Cosmos DB No Customer-Managed Keys"
+    description: "Cosmos DB uses Microsoft-managed keys instead of customer-managed"
+    resource_type: Microsoft.DocumentDB/databaseAccounts
+    severity: low
+    condition:
+      property: properties.keyVaultKeyUri
+      is_empty: true
+    labels:
+      - CosmosDB_NoCMK
+
+  # ========== SQL Server Rules ==========
+  - id: sql-public-endpoint
+    name: "SQL Server Public Endpoint"
+    description: "SQL Server has public endpoint enabled"
+    resource_type: Microsoft.Sql/servers
+    severity: critical
+    cis_reference: "4.1"
+    condition:
+      property: properties.publicNetworkAccess
+      equals: Enabled
+    labels:
+      - SQL_PublicEndpoint
+      - CIS_4.1
+
+  - id: sql-no-auditing
+    name: "SQL Server Auditing Disabled"
+    description: "SQL Server auditing is disabled"
+    resource_type: Microsoft.Sql/servers
+    severity: high
+    cis_reference: "4.2"
+    condition:
+      property: properties.auditingPolicy.state
+      equals: Disabled
+    labels:
+      - SQL_NoAuditing
+      - CIS_4.2
+
+  - id: sql-no-threat-detection
+    name: "SQL Server Threat Detection Disabled"
+    description: "SQL Server threat detection is disabled"
+    resource_type: Microsoft.Sql/servers
+    severity: high
+    cis_reference: "4.3"
+    condition:
+      property: properties.threatDetectionPolicy.state
+      equals: Disabled
+    labels:
+      - SQL_NoThreatDetection
+      - CIS_4.3
+
+  - id: sql-allow-azure-services
+    name: "SQL Server Allow Azure Services"
+    description: "SQL Server allows all Azure services access"
+    resource_type: Microsoft.Sql/servers
+    severity: medium
+    cis_reference: "4.4"
+    condition:
+      property: properties.firewallRules
+      contains:
+        startIpAddress: "0.0.0.0"
+        endIpAddress: "0.0.0.0"
+    labels:
+      - SQL_AllowAzureServices
+      - CIS_4.4
+
+  - id: sql-auth-enabled
+    name: "SQL Server SQL Authentication Enabled"
+    description: "SQL Server allows SQL authentication (not Azure AD only)"
+    resource_type: Microsoft.Sql/servers
+    severity: medium
+    cis_reference: "4.5"
+    condition:
+      property: properties.administrators.azureADOnlyAuthentication
+      equals: false
+    labels:
+      - SQL_SQLAuthEnabled
+      - CIS_4.5
+
+  - id: sql-no-tde
+    name: "SQL Server TDE Disabled"
+    description: "SQL Server Transparent Data Encryption is disabled"
+    resource_type: Microsoft.Sql/servers
+    severity: critical
+    cis_reference: "4.6"
+    condition:
+      property: properties.transparentDataEncryption.state
+      equals: Disabled
+    labels:
+      - SQL_NoTDE
+      - CIS_4.6
+
+  - id: sql-weak-tls
+    name: "SQL Server Weak TLS"
+    description: "SQL Server allows TLS 1.0"
+    resource_type: Microsoft.Sql/servers
+    severity: high
+    cis_reference: "4.7"
+    condition:
+      property: properties.minimalTlsVersion
+      not_in:
+        - "1.2"
+        - "1.3"
+    labels:
+      - SQL_WeakTLS
+      - CIS_4.7

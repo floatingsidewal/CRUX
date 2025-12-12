@@ -1,0 +1,490 @@
+[
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]",
+    "type": "Microsoft.Storage/storageAccounts",
+    "apiVersion": "2023-01-01",
+    "name": "[parameters('storageAccountName')]",
+    "location": "[parameters('location')]",
+    "properties": {
+      "isHnsEnabled": true,
+      "allowBlobPublicAccess": true
+    },
+    "dependsOn": [],
+    "tags": {},
+    "sku": {
+      "name": "Standard_LRS"
+    },
+    "kind": "StorageV2",
+    "_raw": {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2023-01-01",
+      "name": "[parameters('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "isHnsEnabled": true,
+        "allowBlobPublicAccess": true
+      }
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
+      "is_mutated": true,
+      "mutation_id": "storage_public_blob_access",
+      "mutation_description": "Enable public blob access on storage account",
+      "mutation_severity": "high"
+    },
+    "_mutation_applied": [
+      {
+        "mutation_id": "storage_public_blob_access",
+        "labels": [
+          "Storage_PublicAccess",
+          "CIS_3.7"
+        ],
+        "severity": "high"
+      }
+    ]
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]",
+    "type": "Microsoft.Storage/storageAccounts",
+    "apiVersion": "2023-01-01",
+    "name": "[parameters('storageAccountName')]",
+    "location": "[parameters('location')]",
+    "properties": {
+      "isHnsEnabled": true,
+      "minimumTlsVersion": "TLS1_0"
+    },
+    "dependsOn": [],
+    "tags": {},
+    "sku": {
+      "name": "Standard_LRS"
+    },
+    "kind": "StorageV2",
+    "_raw": {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2023-01-01",
+      "name": "[parameters('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "isHnsEnabled": true,
+        "minimumTlsVersion": "TLS1_0"
+      }
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
+      "is_mutated": true,
+      "mutation_id": "storage_weak_tls",
+      "mutation_description": "Set minimum TLS version to 1.0 (weak)",
+      "mutation_severity": "medium"
+    },
+    "_mutation_applied": [
+      {
+        "mutation_id": "storage_weak_tls",
+        "labels": [
+          "Storage_WeakTLS",
+          "CIS_3.8"
+        ],
+        "severity": "medium"
+      }
+    ]
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]",
+    "type": "Microsoft.Storage/storageAccounts",
+    "apiVersion": "2023-01-01",
+    "name": "[parameters('storageAccountName')]",
+    "location": "[parameters('location')]",
+    "properties": {
+      "isHnsEnabled": true,
+      "supportsHttpsTrafficOnly": false
+    },
+    "dependsOn": [],
+    "tags": {},
+    "sku": {
+      "name": "Standard_LRS"
+    },
+    "kind": "StorageV2",
+    "_raw": {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2023-01-01",
+      "name": "[parameters('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "isHnsEnabled": true,
+        "supportsHttpsTrafficOnly": false
+      }
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
+      "is_mutated": true,
+      "mutation_id": "storage_http_allowed",
+      "mutation_description": "Allow HTTP traffic (not HTTPS-only)",
+      "mutation_severity": "high"
+    },
+    "_mutation_applied": [
+      {
+        "mutation_id": "storage_http_allowed",
+        "labels": [
+          "Storage_HTTPAllowed",
+          "CIS_3.1"
+        ],
+        "severity": "high"
+      }
+    ]
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]",
+    "type": "Microsoft.Storage/storageAccounts",
+    "apiVersion": "2023-01-01",
+    "name": "[parameters('storageAccountName')]",
+    "location": "[parameters('location')]",
+    "properties": {
+      "isHnsEnabled": true,
+      "networkAcls": {
+        "defaultAction": "Allow"
+      }
+    },
+    "dependsOn": [],
+    "tags": {},
+    "sku": {
+      "name": "Standard_LRS"
+    },
+    "kind": "StorageV2",
+    "_raw": {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2023-01-01",
+      "name": "[parameters('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "isHnsEnabled": true,
+        "networkAcls": {
+          "defaultAction": "Allow"
+        }
+      }
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
+      "is_mutated": true,
+      "mutation_id": "storage_open_firewall",
+      "mutation_description": "Set firewall to allow all network traffic",
+      "mutation_severity": "high"
+    },
+    "_mutation_applied": [
+      {
+        "mutation_id": "storage_open_firewall",
+        "labels": [
+          "Storage_FirewallOpen",
+          "CIS_3.6"
+        ],
+        "severity": "high"
+      }
+    ]
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]",
+    "type": "Microsoft.Storage/storageAccounts",
+    "apiVersion": "2023-01-01",
+    "name": "[parameters('storageAccountName')]",
+    "location": "[parameters('location')]",
+    "properties": {
+      "isHnsEnabled": true,
+      "supportsHttpsTrafficOnly": false
+    },
+    "dependsOn": [],
+    "tags": {},
+    "sku": {
+      "name": "Standard_LRS"
+    },
+    "kind": "StorageV2",
+    "_raw": {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2023-01-01",
+      "name": "[parameters('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "isHnsEnabled": true,
+        "supportsHttpsTrafficOnly": false
+      }
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
+      "is_mutated": true,
+      "mutation_id": "storage_insecure_transfer",
+      "mutation_description": "Disable secure transfer requirement",
+      "mutation_severity": "critical"
+    },
+    "_mutation_applied": [
+      {
+        "mutation_id": "storage_insecure_transfer",
+        "labels": [
+          "Storage_InsecureTransfer",
+          "CIS_3.1"
+        ],
+        "severity": "critical"
+      }
+    ]
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]",
+    "type": "Microsoft.Storage/storageAccounts",
+    "apiVersion": "2023-01-01",
+    "name": "[parameters('storageAccountName')]",
+    "location": "[parameters('location')]",
+    "properties": {
+      "isHnsEnabled": true,
+      "isVersioningEnabled": false
+    },
+    "dependsOn": [],
+    "tags": {},
+    "sku": {
+      "name": "Standard_LRS"
+    },
+    "kind": "StorageV2",
+    "_raw": {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2023-01-01",
+      "name": "[parameters('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "isHnsEnabled": true,
+        "isVersioningEnabled": false
+      }
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
+      "is_mutated": true,
+      "mutation_id": "storage_no_blob_versioning",
+      "mutation_description": "Disable blob versioning",
+      "mutation_severity": "low"
+    },
+    "_mutation_applied": [
+      {
+        "mutation_id": "storage_no_blob_versioning",
+        "labels": [
+          "Storage_NoVersioning"
+        ],
+        "severity": "low"
+      }
+    ]
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]",
+    "type": "Microsoft.Storage/storageAccounts",
+    "apiVersion": "2023-01-01",
+    "name": "[parameters('storageAccountName')]",
+    "location": "[parameters('location')]",
+    "properties": {
+      "isHnsEnabled": true,
+      "deleteRetentionPolicy": {
+        "enabled": false
+      }
+    },
+    "dependsOn": [],
+    "tags": {},
+    "sku": {
+      "name": "Standard_LRS"
+    },
+    "kind": "StorageV2",
+    "_raw": {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2023-01-01",
+      "name": "[parameters('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "isHnsEnabled": true,
+        "deleteRetentionPolicy": {
+          "enabled": false
+        }
+      }
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
+      "is_mutated": true,
+      "mutation_id": "storage_no_soft_delete",
+      "mutation_description": "Disable blob soft delete",
+      "mutation_severity": "medium"
+    },
+    "_mutation_applied": [
+      {
+        "mutation_id": "storage_no_soft_delete",
+        "labels": [
+          "Storage_NoSoftDelete",
+          "CIS_3.10"
+        ],
+        "severity": "medium"
+      }
+    ]
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]",
+    "type": "Microsoft.Storage/storageAccounts",
+    "apiVersion": "2023-01-01",
+    "name": "[parameters('storageAccountName')]",
+    "location": "[parameters('location')]",
+    "properties": {
+      "isHnsEnabled": true,
+      "allowSharedKeyAccess": true
+    },
+    "dependsOn": [],
+    "tags": {},
+    "sku": {
+      "name": "Standard_LRS"
+    },
+    "kind": "StorageV2",
+    "_raw": {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2023-01-01",
+      "name": "[parameters('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "isHnsEnabled": true,
+        "allowSharedKeyAccess": true
+      }
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
+      "is_mutated": true,
+      "mutation_id": "storage_allow_shared_key",
+      "mutation_description": "Allow shared key access (not just Azure AD)",
+      "mutation_severity": "medium"
+    },
+    "_mutation_applied": [
+      {
+        "mutation_id": "storage_allow_shared_key",
+        "labels": [
+          "Storage_SharedKeyAccess"
+        ],
+        "severity": "medium"
+      }
+    ]
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]",
+    "type": "Microsoft.Storage/storageAccounts",
+    "apiVersion": "2023-01-01",
+    "name": "[parameters('storageAccountName')]",
+    "location": "[parameters('location')]",
+    "properties": {
+      "isHnsEnabled": true,
+      "encryption": {
+        "requireInfrastructureEncryption": false
+      }
+    },
+    "dependsOn": [],
+    "tags": {},
+    "sku": {
+      "name": "Standard_LRS"
+    },
+    "kind": "StorageV2",
+    "_raw": {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2023-01-01",
+      "name": "[parameters('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "isHnsEnabled": true,
+        "encryption": {
+          "requireInfrastructureEncryption": false
+        }
+      }
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
+      "is_mutated": true,
+      "mutation_id": "storage_no_infrastructure_encryption",
+      "mutation_description": "Disable infrastructure encryption",
+      "mutation_severity": "medium"
+    },
+    "_mutation_applied": [
+      {
+        "mutation_id": "storage_no_infrastructure_encryption",
+        "labels": [
+          "Storage_NoInfraEncryption"
+        ],
+        "severity": "medium"
+      }
+    ]
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]",
+    "type": "Microsoft.Storage/storageAccounts",
+    "apiVersion": "2023-01-01",
+    "name": "[parameters('storageAccountName')]",
+    "location": "[parameters('location')]",
+    "properties": {
+      "isHnsEnabled": true,
+      "allowCrossTenantReplication": true
+    },
+    "dependsOn": [],
+    "tags": {},
+    "sku": {
+      "name": "Standard_LRS"
+    },
+    "kind": "StorageV2",
+    "_raw": {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2023-01-01",
+      "name": "[parameters('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "isHnsEnabled": true,
+        "allowCrossTenantReplication": true
+      }
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
+      "is_mutated": true,
+      "mutation_id": "storage_cross_tenant_replication",
+      "mutation_description": "Allow cross-tenant replication",
+      "mutation_severity": "low"
+    },
+    "_mutation_applied": [
+      {
+        "mutation_id": "storage_cross_tenant_replication",
+        "labels": [
+          "Storage_CrossTenantReplication"
+        ],
+        "severity": "low"
+      }
+    ]
+  }
+]

@@ -1,0 +1,71 @@
+{
+  "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]": [
+    "Storage_WeakTLS",
+    "CIS_3.8",
+    "Storage_MissingEncryptionConfig"
+  ],
+  "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]#storage_public_blob_access": [
+    "Storage_PublicAccess",
+    "CIS_3.7",
+    "Storage_WeakTLS",
+    "CIS_3.8",
+    "Storage_MissingEncryptionConfig"
+  ],
+  "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]#storage_weak_tls": [
+    "Storage_WeakTLS",
+    "CIS_3.8",
+    "Storage_MissingEncryptionConfig"
+  ],
+  "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]#storage_http_allowed": [
+    "Storage_WeakTLS",
+    "CIS_3.8",
+    "Storage_HTTPAllowed",
+    "CIS_3.1",
+    "Storage_MissingEncryptionConfig"
+  ],
+  "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]#storage_open_firewall": [
+    "Storage_WeakTLS",
+    "CIS_3.8",
+    "Storage_FirewallOpen",
+    "CIS_3.6",
+    "Storage_MissingEncryptionConfig"
+  ],
+  "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]#storage_insecure_transfer": [
+    "Storage_WeakTLS",
+    "CIS_3.8",
+    "Storage_HTTPAllowed",
+    "CIS_3.1",
+    "Storage_MissingEncryptionConfig"
+  ],
+  "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]#storage_no_blob_versioning": [
+    "Storage_WeakTLS",
+    "CIS_3.8",
+    "Storage_NoVersioning",
+    "Storage_MissingEncryptionConfig"
+  ],
+  "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]#storage_no_soft_delete": [
+    "Storage_WeakTLS",
+    "CIS_3.8",
+    "Storage_NoSoftDelete",
+    "CIS_3.10",
+    "Storage_MissingEncryptionConfig"
+  ],
+  "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]#storage_allow_shared_key": [
+    "Storage_WeakTLS",
+    "CIS_3.8",
+    "Storage_SharedKeyAccess",
+    "Storage_MissingEncryptionConfig"
+  ],
+  "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]#storage_no_infrastructure_encryption": [
+    "Storage_WeakTLS",
+    "CIS_3.8",
+    "Storage_NoInfraEncryption",
+    "Storage_MissingEncryptionConfig"
+  ],
+  "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]#storage_cross_tenant_replication": [
+    "Storage_WeakTLS",
+    "CIS_3.8",
+    "Storage_CrossTenantReplication",
+    "Storage_MissingEncryptionConfig"
+  ]
+}

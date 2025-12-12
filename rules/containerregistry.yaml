@@ -1,0 +1,100 @@
+# Container Registry Security Rules
+# Based on Azure Container Registry security best practices
+# and supply chain security requirements
+
+rules:
+  - id: acr-admin-user-enabled
+    name: "Container Registry Admin User Enabled"
+    description: "Container Registry has admin user enabled (shared credentials risk)"
+    resource_type: Microsoft.ContainerRegistry/registries
+    severity: high
+    cis_reference: "ACR_1"
+    condition:
+      property: properties.adminUserEnabled
+      equals: true
+    labels:
+      - ACR_AdminUserEnabled
+      - CIS_ACR_1
+
+  - id: acr-public-access
+    name: "Container Registry Public Access"
+    description: "Container Registry allows public network access"
+    resource_type: Microsoft.ContainerRegistry/registries
+    severity: high
+    cis_reference: "ACR_2"
+    condition:
+      property: properties.publicNetworkAccess
+      equals: Enabled
+    labels:
+      - ACR_PublicAccess
+      - CIS_ACR_2
+
+  - id: acr-anonymous-pull
+    name: "Container Registry Anonymous Pull"
+    description: "Container Registry allows anonymous image pulls"
+    resource_type: Microsoft.ContainerRegistry/registries
+    severity: critical
+    cis_reference: "ACR_3"
+    condition:
+      property: properties.anonymousPullEnabled
+      equals: true
+    labels:
+      - ACR_AnonymousPull
+      - CIS_ACR_3
+
+  - id: acr-no-content-trust
+    name: "Container Registry Content Trust Disabled"
+    description: "Container Registry does not enforce content trust (unsigned images)"
+    resource_type: Microsoft.ContainerRegistry/registries
+    severity: high
+    cis_reference: "ACR_4"
+    condition:
+      property: properties.policies.trustPolicy.status
+      equals: disabled
+    labels:
+      - ACR_NoContentTrust
+      - CIS_ACR_4
+
+  - id: acr-basic-sku
+    name: "Container Registry Basic SKU"
+    description: "Container Registry uses Basic SKU (limited security features)"
+    resource_type: Microsoft.ContainerRegistry/registries
+    severity: medium
+    condition:
+      property: sku.name
+      equals: Basic
+    labels:
+      - ACR_BasicSKU
+
+  - id: acr-no-zone-redundancy
+    name: "Container Registry No Zone Redundancy"
+    description: "Container Registry is not zone redundant"
+    resource_type: Microsoft.ContainerRegistry/registries
+    severity: low
+    condition:
+      property: properties.zoneRedundancy
+      equals: Disabled
+    labels:
+      - ACR_NoZoneRedundancy
+
+  - id: acr-no-quarantine
+    name: "Container Registry Quarantine Disabled"
+    description: "Container Registry quarantine policy is disabled"
+    resource_type: Microsoft.ContainerRegistry/registries
+    severity: medium
+    condition:
+      property: properties.policies.quarantinePolicy.status
+      equals: disabled
+    labels:
+      - ACR_NoQuarantine
+
+  - id: acr-export-enabled
+    name: "Container Registry Export Enabled"
+    description: "Container Registry allows image export (data exfiltration risk)"
+    resource_type: Microsoft.ContainerRegistry/registries
+    severity: medium
+    condition:
+      property: properties.policies.exportPolicy.status
+      equals: enabled
+    labels:
+      - ACR_ExportEnabled

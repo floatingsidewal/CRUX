@@ -1,0 +1,126 @@
+# Key Vault Security Rules
+# Based on CIS Microsoft Azure Foundations Benchmark v2.0.0
+# and real-world security incidents
+
+rules:
+  - id: kv-no-purge-protection
+    name: "Key Vault Purge Protection Disabled"
+    description: "Key Vault purge protection is disabled, allowing permanent deletion"
+    resource_type: Microsoft.KeyVault/vaults
+    severity: high
+    cis_reference: "8.4"
+    condition:
+      property: properties.enablePurgeProtection
+      equals: false
+    labels:
+      - KeyVault_NoPurgeProtection
+      - CIS_8.4
+
+  - id: kv-no-soft-delete
+    name: "Key Vault Soft Delete Disabled"
+    description: "Key Vault soft delete is disabled, no recovery for deleted secrets"
+    resource_type: Microsoft.KeyVault/vaults
+    severity: high
+    cis_reference: "8.5"
+    condition:
+      property: properties.enableSoftDelete
+      equals: false
+    labels:
+      - KeyVault_NoSoftDelete
+      - CIS_8.5
+
+  - id: kv-public-access
+    name: "Key Vault Public Network Access"
+    description: "Key Vault is accessible from public internet"
+    resource_type: Microsoft.KeyVault/vaults
+    severity: critical
+    cis_reference: "8.6"
+    condition:
+      property: properties.publicNetworkAccess
+      equals: Enabled
+    labels:
+      - KeyVault_PublicAccess
+      - CIS_8.6
+
+  - id: kv-no-rbac
+    name: "Key Vault RBAC Disabled"
+    description: "Key Vault uses legacy access policies instead of RBAC"
+    resource_type: Microsoft.KeyVault/vaults
+    severity: medium
+    cis_reference: "8.7"
+    condition:
+      property: properties.enableRbacAuthorization
+      equals: false
+    labels:
+      - KeyVault_NoRBAC
+      - CIS_8.7
+
+  - id: kv-permissive-access
+    name: "Key Vault Overly Permissive Access"
+    description: "Key Vault has overly permissive access policies"
+    resource_type: Microsoft.KeyVault/vaults
+    severity: critical
+    condition:
+      property: properties.accessPolicies
+      contains_any:
+        - permissions.secrets: ["all"]
+        - permissions.keys: ["all"]
+    labels:
+      - KeyVault_PermissiveAccess
+
+  - id: kv-no-logging
+    name: "Key Vault Logging Not Configured"
+    description: "Key Vault diagnostic logging is not configured"
+    resource_type: Microsoft.KeyVault/vaults
+    severity: medium
+    cis_reference: "8.1"
+    labels:
+      - KeyVault_NoLogging
+      - CIS_8.1
+
+  - id: kv-short-retention
+    name: "Key Vault Short Soft Delete Retention"
+    description: "Key Vault soft delete retention is set to minimum (7 days)"
+    resource_type: Microsoft.KeyVault/vaults
+    severity: low
+    condition:
+      property: properties.softDeleteRetentionInDays
+      less_than: 30
+    labels:
+      - KeyVault_ShortRetention
+
+  - id: kv-services-bypass
+    name: "Key Vault Azure Services Bypass"
+    description: "Key Vault allows Azure services to bypass firewall"
+    resource_type: Microsoft.KeyVault/vaults
+    severity: medium
+    condition:
+      property: properties.networkAcls.bypass
+      equals: AzureServices
+    labels:
+      - KeyVault_ServicesBypass
+
+  - id: kv-no-private-endpoint
+    name: "Key Vault No Private Endpoint"
+    description: "Key Vault is not using private endpoint"
+    resource_type: Microsoft.KeyVault/vaults
+    severity: high
+    condition:
+      all:
+        - property: properties.publicNetworkAccess
+          equals: Enabled
+        - property: properties.networkAcls.virtualNetworkRules
+          is_empty: true
+    labels:
+      - KeyVault_NoPrivateEndpoint
+
+  - id: kv-standard-sku
+    name: "Key Vault Standard SKU (No HSM)"
+    description: "Key Vault uses standard SKU without HSM protection"
+    resource_type: Microsoft.KeyVault/vaults
+    severity: low
+    condition:
+      property: properties.sku.name
+      equals: standard
+    labels:
+      - KeyVault_NoHSM
