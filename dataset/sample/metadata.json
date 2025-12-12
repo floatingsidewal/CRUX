@@ -1,6 +1,6 @@
 {
   "experiment_name": "sample",
-  "timestamp": "2025-11-15T12:53:57.605439",
+  "timestamp": "2025-12-12T10:27:28.486729",
   "mutations": [
     {
       "id": "storage_public_blob_access",
@@ -322,9 +322,574 @@
       "labels": [
         "VNet_NoBGP"
       ]
+    },
+    {
+      "id": "kv_no_purge_protection",
+      "target_type": "Microsoft.KeyVault/vaults",
+      "description": "Disable purge protection (allows permanent deletion)",
+      "severity": "high",
+      "labels": [
+        "KeyVault_NoPurgeProtection",
+        "CIS_8.4"
+      ]
+    },
+    {
+      "id": "kv_no_soft_delete",
+      "target_type": "Microsoft.KeyVault/vaults",
+      "description": "Disable soft delete (no recovery for deleted secrets)",
+      "severity": "high",
+      "labels": [
+        "KeyVault_NoSoftDelete",
+        "CIS_8.5"
+      ]
+    },
+    {
+      "id": "kv_public_network_access",
+      "target_type": "Microsoft.KeyVault/vaults",
+      "description": "Enable public network access to Key Vault",
+      "severity": "critical",
+      "labels": [
+        "KeyVault_PublicAccess",
+        "CIS_8.6"
+      ]
+    },
+    {
+      "id": "kv_no_rbac",
+      "target_type": "Microsoft.KeyVault/vaults",
+      "description": "Disable RBAC authorization (use legacy access policies)",
+      "severity": "medium",
+      "labels": [
+        "KeyVault_NoRBAC",
+        "CIS_8.7"
+      ]
+    },
+    {
+      "id": "kv_permissive_access",
+      "target_type": "Microsoft.KeyVault/vaults",
+      "description": "Add overly permissive access policy (all permissions)",
+      "severity": "critical",
+      "labels": [
+        "KeyVault_PermissiveAccess"
+      ]
+    },
+    {
+      "id": "kv_no_logging",
+      "target_type": "Microsoft.KeyVault/vaults",
+      "description": "Key Vault without diagnostic logging configured",
+      "severity": "medium",
+      "labels": [
+        "KeyVault_NoLogging",
+        "CIS_8.1"
+      ]
+    },
+    {
+      "id": "kv_short_retention",
+      "target_type": "Microsoft.KeyVault/vaults",
+      "description": "Set minimum soft delete retention (7 days)",
+      "severity": "low",
+      "labels": [
+        "KeyVault_ShortRetention"
+      ]
+    },
+    {
+      "id": "kv_services_bypass",
+      "target_type": "Microsoft.KeyVault/vaults",
+      "description": "Allow Azure services to bypass Key Vault firewall",
+      "severity": "medium",
+      "labels": [
+        "KeyVault_ServicesBypass"
+      ]
+    },
+    {
+      "id": "kv_no_private_endpoint",
+      "target_type": "Microsoft.KeyVault/vaults",
+      "description": "No private endpoint (traffic over public internet)",
+      "severity": "high",
+      "labels": [
+        "KeyVault_NoPrivateEndpoint"
+      ]
+    },
+    {
+      "id": "kv_standard_sku",
+      "target_type": "Microsoft.KeyVault/vaults",
+      "description": "Use Standard SKU (no HSM protection for keys)",
+      "severity": "low",
+      "labels": [
+        "KeyVault_NoHSM"
+      ]
+    },
+    {
+      "id": "webapp_http_only",
+      "target_type": "Microsoft.Web/sites",
+      "description": "Disable HTTPS-only (allow unencrypted HTTP)",
+      "severity": "high",
+      "labels": [
+        "WebApp_HTTPOnly",
+        "CIS_9.2"
+      ]
+    },
+    {
+      "id": "webapp_weak_tls",
+      "target_type": "Microsoft.Web/sites",
+      "description": "Set minimum TLS version to 1.0 (vulnerable)",
+      "severity": "high",
+      "labels": [
+        "WebApp_WeakTLS",
+        "CIS_9.3"
+      ]
+    },
+    {
+      "id": "webapp_remote_debugging",
+      "target_type": "Microsoft.Web/sites",
+      "description": "Enable remote debugging (security risk in production)",
+      "severity": "critical",
+      "labels": [
+        "WebApp_RemoteDebugging",
+        "CIS_9.7"
+      ]
+    },
+    {
+      "id": "webapp_ftp_enabled",
+      "target_type": "Microsoft.Web/sites",
+      "description": "Enable FTP deployment (cleartext credentials)",
+      "severity": "high",
+      "labels": [
+        "WebApp_FTPEnabled",
+        "CIS_9.4"
+      ]
+    },
+    {
+      "id": "webapp_no_managed_identity",
+      "target_type": "Microsoft.Web/sites",
+      "description": "No managed identity (forces credential storage)",
+      "severity": "medium",
+      "labels": [
+        "WebApp_NoManagedIdentity",
+        "CIS_9.5"
+      ]
+    },
+    {
+      "id": "webapp_no_client_cert",
+      "target_type": "Microsoft.Web/sites",
+      "description": "Disable client certificate authentication",
+      "severity": "medium",
+      "labels": [
+        "WebApp_NoClientCert",
+        "CIS_9.6"
+      ]
+    },
+    {
+      "id": "webapp_public_network",
+      "target_type": "Microsoft.Web/sites",
+      "description": "Allow all public network access (no IP restrictions)",
+      "severity": "medium",
+      "labels": [
+        "WebApp_PublicNetwork"
+      ]
+    },
+    {
+      "id": "webapp_no_https_redirect",
+      "target_type": "Microsoft.Web/sites",
+      "description": "Disable automatic HTTPS redirect",
+      "severity": "medium",
+      "labels": [
+        "WebApp_NoHTTPSRedirect"
+      ]
+    },
+    {
+      "id": "webapp_http20_misconfigured",
+      "target_type": "Microsoft.Web/sites",
+      "description": "HTTP/2 enabled with weak TLS (misconfiguration)",
+      "severity": "medium",
+      "labels": [
+        "WebApp_HTTP20Misconfigured"
+      ]
+    },
+    {
+      "id": "webapp_always_on_disabled",
+      "target_type": "Microsoft.Web/sites",
+      "description": "Disable Always On (cold start vulnerability)",
+      "severity": "low",
+      "labels": [
+        "WebApp_AlwaysOnDisabled"
+      ]
+    },
+    {
+      "id": "webapp_no_auth",
+      "target_type": "Microsoft.Web/sites",
+      "description": "Disable App Service authentication",
+      "severity": "high",
+      "labels": [
+        "WebApp_NoAuth",
+        "CIS_9.1"
+      ]
+    },
+    {
+      "id": "webapp_32bit_worker",
+      "target_type": "Microsoft.Web/sites",
+      "description": "Use 32-bit worker process (memory limited)",
+      "severity": "low",
+      "labels": [
+        "WebApp_32BitWorker"
+      ]
+    },
+    {
+      "id": "acr_admin_user_enabled",
+      "target_type": "Microsoft.ContainerRegistry/registries",
+      "description": "Enable admin user (shared credentials, single point of failure)",
+      "severity": "high",
+      "labels": [
+        "ACR_AdminUserEnabled",
+        "CIS_ACR_1"
+      ]
+    },
+    {
+      "id": "acr_public_access",
+      "target_type": "Microsoft.ContainerRegistry/registries",
+      "description": "Enable public network access (images accessible from internet)",
+      "severity": "high",
+      "labels": [
+        "ACR_PublicAccess",
+        "CIS_ACR_2"
+      ]
+    },
+    {
+      "id": "acr_anonymous_pull",
+      "target_type": "Microsoft.ContainerRegistry/registries",
+      "description": "Enable anonymous pull (images publicly accessible)",
+      "severity": "critical",
+      "labels": [
+        "ACR_AnonymousPull",
+        "CIS_ACR_3"
+      ]
+    },
+    {
+      "id": "acr_no_content_trust",
+      "target_type": "Microsoft.ContainerRegistry/registries",
+      "description": "Disable content trust (allow unsigned images)",
+      "severity": "high",
+      "labels": [
+        "ACR_NoContentTrust",
+        "CIS_ACR_4"
+      ]
+    },
+    {
+      "id": "acr_basic_sku",
+      "target_type": "Microsoft.ContainerRegistry/registries",
+      "description": "Use Basic SKU (limited security features)",
+      "severity": "medium",
+      "labels": [
+        "ACR_BasicSKU"
+      ]
+    },
+    {
+      "id": "acr_no_zone_redundancy",
+      "target_type": "Microsoft.ContainerRegistry/registries",
+      "description": "Disable zone redundancy (single point of failure)",
+      "severity": "low",
+      "labels": [
+        "ACR_NoZoneRedundancy"
+      ]
+    },
+    {
+      "id": "acr_no_quarantine",
+      "target_type": "Microsoft.ContainerRegistry/registries",
+      "description": "Disable quarantine policy (vulnerable images not scanned)",
+      "severity": "medium",
+      "labels": [
+        "ACR_NoQuarantine"
+      ]
+    },
+    {
+      "id": "acr_export_enabled",
+      "target_type": "Microsoft.ContainerRegistry/registries",
+      "description": "Enable image export (data exfiltration risk)",
+      "severity": "medium",
+      "labels": [
+        "ACR_ExportEnabled"
+      ]
+    },
+    {
+      "id": "cosmosdb_public_access",
+      "target_type": "Microsoft.DocumentDB/databaseAccounts",
+      "description": "Enable public network access (database exposed to internet)",
+      "severity": "critical",
+      "labels": [
+        "CosmosDB_PublicAccess",
+        "CIS_5.1"
+      ]
+    },
+    {
+      "id": "cosmosdb_local_auth",
+      "target_type": "Microsoft.DocumentDB/databaseAccounts",
+      "description": "Enable local authentication (key-based instead of Azure AD)",
+      "severity": "medium",
+      "labels": [
+        "CosmosDB_LocalAuth",
+        "CIS_5.2"
+      ]
+    },
+    {
+      "id": "cosmosdb_no_failover",
+      "target_type": "Microsoft.DocumentDB/databaseAccounts",
+      "description": "Disable automatic failover (availability risk)",
+      "severity": "medium",
+      "labels": [
+        "CosmosDB_NoFailover"
+      ]
+    },
+    {
+      "id": "cosmosdb_allow_azure",
+      "target_type": "Microsoft.DocumentDB/databaseAccounts",
+      "description": "Allow access from all Azure datacenters (overly permissive)",
+      "severity": "high",
+      "labels": [
+        "CosmosDB_AllowAllAzure",
+        "CIS_5.3"
+      ]
+    },
+    {
+      "id": "cosmosdb_no_cmk",
+      "target_type": "Microsoft.DocumentDB/databaseAccounts",
+      "description": "Use Microsoft-managed keys (not customer-managed)",
+      "severity": "low",
+      "labels": [
+        "CosmosDB_NoCMK"
+      ]
+    },
+    {
+      "id": "sql_public_endpoint",
+      "target_type": "Microsoft.Sql/servers",
+      "description": "Enable public endpoint (SQL Server exposed to internet)",
+      "severity": "critical",
+      "labels": [
+        "SQL_PublicEndpoint",
+        "CIS_4.1"
+      ]
+    },
+    {
+      "id": "sql_no_auditing",
+      "target_type": "Microsoft.Sql/servers",
+      "description": "Disable SQL Server auditing (no audit trail)",
+      "severity": "high",
+      "labels": [
+        "SQL_NoAuditing",
+        "CIS_4.2"
+      ]
+    },
+    {
+      "id": "sql_no_threat_detection",
+      "target_type": "Microsoft.Sql/servers",
+      "description": "Disable SQL threat detection (no anomaly alerts)",
+      "severity": "high",
+      "labels": [
+        "SQL_NoThreatDetection",
+        "CIS_4.3"
+      ]
+    },
+    {
+      "id": "sql_allow_azure_services",
+      "target_type": "Microsoft.Sql/servers",
+      "description": "Allow all Azure services access (overly permissive)",
+      "severity": "medium",
+      "labels": [
+        "SQL_AllowAzureServices",
+        "CIS_4.4"
+      ]
+    },
+    {
+      "id": "sql_auth_enabled",
+      "target_type": "Microsoft.Sql/servers",
+      "description": "Enable SQL authentication (password-based, not Azure AD only)",
+      "severity": "medium",
+      "labels": [
+        "SQL_SQLAuthEnabled",
+        "CIS_4.5"
+      ]
+    },
+    {
+      "id": "sql_no_tde",
+      "target_type": "Microsoft.Sql/servers",
+      "description": "Disable Transparent Data Encryption (data at rest unencrypted)",
+      "severity": "critical",
+      "labels": [
+        "SQL_NoTDE",
+        "CIS_4.6"
+      ]
+    },
+    {
+      "id": "sql_weak_tls",
+      "target_type": "Microsoft.Sql/servers",
+      "description": "Set minimum TLS version to 1.0 (vulnerable)",
+      "severity": "high",
+      "labels": [
+        "SQL_WeakTLS",
+        "CIS_4.7"
+      ]
+    },
+    {
+      "id": "pip_basic_sku",
+      "target_type": "Microsoft.Network/publicIPAddresses",
+      "description": "Use Basic SKU (no DDoS protection or zone redundancy)",
+      "severity": "high",
+      "labels": [
+        "PIP_BasicSKU",
+        "CIS_6.7"
+      ]
+    },
+    {
+      "id": "pip_dynamic_allocation",
+      "target_type": "Microsoft.Network/publicIPAddresses",
+      "description": "Use dynamic IP allocation (IP changes on restart)",
+      "severity": "low",
+      "labels": [
+        "PIP_DynamicAllocation"
+      ]
+    },
+    {
+      "id": "pip_no_ddos",
+      "target_type": "Microsoft.Network/publicIPAddresses",
+      "description": "No DDoS protection plan configured",
+      "severity": "high",
+      "labels": [
+        "PIP_NoDDoS",
+        "CIS_6.8"
+      ]
+    },
+    {
+      "id": "pip_ipv4_only",
+      "target_type": "Microsoft.Network/publicIPAddresses",
+      "description": "IPv4 only (no IPv6 support)",
+      "severity": "low",
+      "labels": [
+        "PIP_IPv4Only"
+      ]
+    },
+    {
+      "id": "pip_short_timeout",
+      "target_type": "Microsoft.Network/publicIPAddresses",
+      "description": "Short idle timeout (4 minutes, may cause connection drops)",
+      "severity": "low",
+      "labels": [
+        "PIP_ShortTimeout"
+      ]
+    },
+    {
+      "id": "lb_basic_sku",
+      "target_type": "Microsoft.Network/loadBalancers",
+      "description": "Use Basic SKU (no availability zones, limited security)",
+      "severity": "medium",
+      "labels": [
+        "LB_BasicSKU"
+      ]
+    },
+    {
+      "id": "lb_no_health_probes",
+      "target_type": "Microsoft.Network/loadBalancers",
+      "description": "No health probes (traffic sent to unhealthy backends)",
+      "severity": "high",
+      "labels": [
+        "LB_NoHealthProbes"
+      ]
+    },
+    {
+      "id": "lb_open_management",
+      "target_type": "Microsoft.Network/loadBalancers",
+      "description": "NAT rules expose management ports (RDP/SSH) publicly",
+      "severity": "critical",
+      "labels": [
+        "LB_OpenManagement",
+        "CIS_6.9"
+      ]
+    },
+    {
+      "id": "lb_no_outbound_rules",
+      "target_type": "Microsoft.Network/loadBalancers",
+      "description": "No outbound rules (port exhaustion risk with implicit SNAT)",
+      "severity": "medium",
+      "labels": [
+        "LB_NoOutboundRules"
+      ]
+    },
+    {
+      "id": "lb_no_tcp_reset",
+      "target_type": "Microsoft.Network/loadBalancers",
+      "description": "Disable TCP reset on idle (connections hang)",
+      "severity": "low",
+      "labels": [
+        "LB_NoTCPReset"
+      ]
+    },
+    {
+      "id": "lb_floating_ip",
+      "target_type": "Microsoft.Network/loadBalancers",
+      "description": "Floating IP enabled (DSR mode, requires special backend config)",
+      "severity": "low",
+      "labels": [
+        "LB_FloatingIP"
+      ]
+    },
+    {
+      "id": "lb_all_ports",
+      "target_type": "Microsoft.Network/loadBalancers",
+      "description": "HA Ports rule (all ports forwarded to backend)",
+      "severity": "medium",
+      "labels": [
+        "LB_AllPorts"
+      ]
     }
   ],
   "rules": [
+    {
+      "id": "kv-no-purge-protection",
+      "resource_type": "Microsoft.KeyVault/vaults",
+      "severity": "high"
+    },
+    {
+      "id": "kv-no-soft-delete",
+      "resource_type": "Microsoft.KeyVault/vaults",
+      "severity": "high"
+    },
+    {
+      "id": "kv-public-access",
+      "resource_type": "Microsoft.KeyVault/vaults",
+      "severity": "critical"
+    },
+    {
+      "id": "kv-no-rbac",
+      "resource_type": "Microsoft.KeyVault/vaults",
+      "severity": "medium"
+    },
+    {
+      "id": "kv-permissive-access",
+      "resource_type": "Microsoft.KeyVault/vaults",
+      "severity": "critical"
+    },
+    {
+      "id": "kv-no-logging",
+      "resource_type": "Microsoft.KeyVault/vaults",
+      "severity": "medium"
+    },
+    {
+      "id": "kv-short-retention",
+      "resource_type": "Microsoft.KeyVault/vaults",
+      "severity": "low"
+    },
+    {
+      "id": "kv-services-bypass",
+      "resource_type": "Microsoft.KeyVault/vaults",
+      "severity": "medium"
+    },
+    {
+      "id": "kv-no-private-endpoint",
+      "resource_type": "Microsoft.KeyVault/vaults",
+      "severity": "high"
+    },
+    {
+      "id": "kv-standard-sku",
+      "resource_type": "Microsoft.KeyVault/vaults",
+      "severity": "low"
+    },
     {
       "id": "vm-no-disk-encryption",
       "resource_type": "Microsoft.Compute/virtualMachines",
@@ -391,64 +956,124 @@
       "severity": "low"
     },
     {
-      "id": "storage-public-blob-access",
-      "resource_type": "Microsoft.Storage/storageAccounts",
+      "id": "pip-basic-sku",
+      "resource_type": "Microsoft.Network/publicIPAddresses",
       "severity": "high"
     },
     {
-      "id": "storage-weak-tls",
-      "resource_type": "Microsoft.Storage/storageAccounts",
-      "severity": "medium"
+      "id": "pip-dynamic-allocation",
+      "resource_type": "Microsoft.Network/publicIPAddresses",
+      "severity": "low"
     },
     {
-      "id": "storage-http-allowed",
-      "resource_type": "Microsoft.Storage/storageAccounts",
+      "id": "pip-no-ddos",
+      "resource_type": "Microsoft.Network/publicIPAddresses",
       "severity": "high"
     },
     {
-      "id": "storage-firewall-open",
-      "resource_type": "Microsoft.Storage/storageAccounts",
+      "id": "pip-ipv4-only",
+      "resource_type": "Microsoft.Network/publicIPAddresses",
+      "severity": "low"
+    },
+    {
+      "id": "pip-short-timeout",
+      "resource_type": "Microsoft.Network/publicIPAddresses",
+      "severity": "low"
+    },
+    {
+      "id": "lb-basic-sku",
+      "resource_type": "Microsoft.Network/loadBalancers",
+      "severity": "medium"
+    },
+    {
+      "id": "lb-no-health-probes",
+      "resource_type": "Microsoft.Network/loadBalancers",
       "severity": "high"
     },
     {
-      "id": "storage-no-soft-delete",
-      "resource_type": "Microsoft.Storage/storageAccounts",
-      "severity": "medium"
-    },
-    {
-      "id": "storage-shared-key-access",
-      "resource_type": "Microsoft.Storage/storageAccounts",
-      "severity": "medium"
-    },
-    {
-      "id": "storage-no-versioning",
-      "resource_type": "Microsoft.Storage/storageAccounts",
-      "severity": "low"
-    },
-    {
-      "id": "storage-no-infrastructure-encryption",
-      "resource_type": "Microsoft.Storage/storageAccounts",
-      "severity": "medium"
-    },
-    {
-      "id": "storage-cross-tenant-replication",
-      "resource_type": "Microsoft.Storage/storageAccounts",
-      "severity": "low"
-    },
-    {
-      "id": "storage-logging-disabled",
-      "resource_type": "Microsoft.Storage/storageAccounts",
-      "severity": "low"
-    },
-    {
-      "id": "storage-no-encryption",
-      "resource_type": "Microsoft.Storage/storageAccounts",
+      "id": "lb-open-management",
+      "resource_type": "Microsoft.Network/loadBalancers",
       "severity": "critical"
     },
     {
-      "id": "storage-default-no-encryption",
-      "resource_type": "Microsoft.Storage/storageAccounts",
+      "id": "lb-no-outbound-rules",
+      "resource_type": "Microsoft.Network/loadBalancers",
       "severity": "medium"
+    },
+    {
+      "id": "lb-no-tcp-reset",
+      "resource_type": "Microsoft.Network/loadBalancers",
+      "severity": "low"
+    },
+    {
+      "id": "lb-floating-ip",
+      "resource_type": "Microsoft.Network/loadBalancers",
+      "severity": "low"
+    },
+    {
+      "id": "lb-all-ports",
+      "resource_type": "Microsoft.Network/loadBalancers",
+      "severity": "medium"
+    },
+    {
+      "id": "cosmosdb-public-access",
+      "resource_type": "Microsoft.DocumentDB/databaseAccounts",
+      "severity": "critical"
+    },
+    {
+      "id": "cosmosdb-local-auth",
+      "resource_type": "Microsoft.DocumentDB/databaseAccounts",
+      "severity": "medium"
+    },
+    {
+      "id": "cosmosdb-no-failover",
+      "resource_type": "Microsoft.DocumentDB/databaseAccounts",
+      "severity": "medium"
+    },
+    {
+      "id": "cosmosdb-allow-all-azure",
+      "resource_type": "Microsoft.DocumentDB/databaseAccounts",
+      "severity": "high"
+    },
+    {
+      "id": "cosmosdb-no-cmk",
+      "resource_type": "Microsoft.DocumentDB/databaseAccounts",
+      "severity": "low"
+    },
+    {
+      "id": "sql-public-endpoint",
+      "resource_type": "Microsoft.Sql/servers",
+      "severity": "critical"
+    },
+    {
+      "id": "sql-no-auditing",
+      "resource_type": "Microsoft.Sql/servers",
+      "severity": "high"
+    },
+    {
+      "id": "sql-no-threat-detection",
+      "resource_type": "Microsoft.Sql/servers",
+      "severity": "high"
+    },
+    {
+      "id": "sql-allow-azure-services",
+      "resource_type": "Microsoft.Sql/servers",
+      "severity": "medium"
+    },
+    {
+      "id": "sql-auth-enabled",
+      "resource_type": "Microsoft.Sql/servers",
+      "severity": "medium"
+    },
+    {
+      "id": "sql-no-tde",
+      "resource_type": "Microsoft.Sql/servers",
+      "severity": "critical"
+    },
+    {
+      "id": "sql-weak-tls",
+      "resource_type": "Microsoft.Sql/servers",
+      "severity": "high"
     },
     {
       "id": "nsg-allow-all-inbound",
@@ -534,14 +1159,174 @@
       "id": "vnet-missing-address-space",
       "resource_type": "Microsoft.Network/virtualNetworks",
       "severity": "critical"
+    },
+    {
+      "id": "storage-public-blob-access",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "high"
+    },
+    {
+      "id": "storage-weak-tls",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "medium"
+    },
+    {
+      "id": "storage-http-allowed",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "high"
+    },
+    {
+      "id": "storage-firewall-open",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "high"
+    },
+    {
+      "id": "storage-no-soft-delete",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "medium"
+    },
+    {
+      "id": "storage-shared-key-access",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "medium"
+    },
+    {
+      "id": "storage-no-versioning",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "low"
+    },
+    {
+      "id": "storage-no-infrastructure-encryption",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "medium"
+    },
+    {
+      "id": "storage-cross-tenant-replication",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "low"
+    },
+    {
+      "id": "storage-logging-disabled",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "low"
+    },
+    {
+      "id": "storage-no-encryption",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "critical"
+    },
+    {
+      "id": "storage-default-no-encryption",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "severity": "medium"
+    },
+    {
+      "id": "webapp-http-only",
+      "resource_type": "Microsoft.Web/sites",
+      "severity": "high"
+    },
+    {
+      "id": "webapp-weak-tls",
+      "resource_type": "Microsoft.Web/sites",
+      "severity": "high"
+    },
+    {
+      "id": "webapp-remote-debugging",
+      "resource_type": "Microsoft.Web/sites",
+      "severity": "critical"
+    },
+    {
+      "id": "webapp-ftp-enabled",
+      "resource_type": "Microsoft.Web/sites",
+      "severity": "high"
+    },
+    {
+      "id": "webapp-no-managed-identity",
+      "resource_type": "Microsoft.Web/sites",
+      "severity": "medium"
+    },
+    {
+      "id": "webapp-no-client-cert",
+      "resource_type": "Microsoft.Web/sites",
+      "severity": "medium"
+    },
+    {
+      "id": "webapp-public-network",
+      "resource_type": "Microsoft.Web/sites",
+      "severity": "medium"
+    },
+    {
+      "id": "webapp-no-https-redirect",
+      "resource_type": "Microsoft.Web/sites",
+      "severity": "medium"
+    },
+    {
+      "id": "webapp-http20-misconfigured",
+      "resource_type": "Microsoft.Web/sites",
+      "severity": "medium"
+    },
+    {
+      "id": "webapp-always-on-disabled",
+      "resource_type": "Microsoft.Web/sites",
+      "severity": "low"
+    },
+    {
+      "id": "webapp-no-auth",
+      "resource_type": "Microsoft.Web/sites",
+      "severity": "high"
+    },
+    {
+      "id": "webapp-32bit-worker",
+      "resource_type": "Microsoft.Web/sites",
+      "severity": "low"
+    },
+    {
+      "id": "acr-admin-user-enabled",
+      "resource_type": "Microsoft.ContainerRegistry/registries",
+      "severity": "high"
+    },
+    {
+      "id": "acr-public-access",
+      "resource_type": "Microsoft.ContainerRegistry/registries",
+      "severity": "high"
+    },
+    {
+      "id": "acr-anonymous-pull",
+      "resource_type": "Microsoft.ContainerRegistry/registries",
+      "severity": "critical"
+    },
+    {
+      "id": "acr-no-content-trust",
+      "resource_type": "Microsoft.ContainerRegistry/registries",
+      "severity": "high"
+    },
+    {
+      "id": "acr-basic-sku",
+      "resource_type": "Microsoft.ContainerRegistry/registries",
+      "severity": "medium"
+    },
+    {
+      "id": "acr-no-zone-redundancy",
+      "resource_type": "Microsoft.ContainerRegistry/registries",
+      "severity": "low"
+    },
+    {
+      "id": "acr-no-quarantine",
+      "resource_type": "Microsoft.ContainerRegistry/registries",
+      "severity": "medium"
+    },
+    {
+      "id": "acr-export-enabled",
+      "resource_type": "Microsoft.ContainerRegistry/registries",
+      "severity": "medium"
     }
   ],
   "statistics": {
-    "templates_processed": 5,
+    "templates_processed": 10,
     "templates_failed": 0,
-    "baseline_resources": 20,
-    "mutated_resources": 10,
-    "mutations_applied": 10,
-    "labels_generated": 47
+    "baseline_resources": 24,
+    "mutated_resources": 110,
+    "mutations_applied": 110,
+    "labels_generated": 451
   }
 }

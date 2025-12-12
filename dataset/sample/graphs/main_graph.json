@@ -1,0 +1,18 @@
+{
+  "nodes": [
+    {
+      "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[parameters('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "api_version": "2022-09-01",
+      "properties": {},
+      "sku": {
+        "name": "[parameters('storageAccountType')]"
+      },
+      "kind": "StorageV2",
+      "tags": {}
+    }
+  ],
+  "edges": []
+}

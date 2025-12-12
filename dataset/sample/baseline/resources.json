@@ -1,760 +1,151 @@
 [
   {
-    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.PowerBIDedicated/capacities/[parameters('name')]",
-    "type": "Microsoft.PowerBIDedicated/capacities",
-    "apiVersion": "2018-09-01-preview",
-    "name": "[parameters('name')]",
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]",
+    "type": "Microsoft.Storage/storageAccounts",
+    "apiVersion": "2023-05-01",
+    "name": "[parameters('storageAccountName')]",
     "location": "[parameters('location')]",
     "properties": {
-      "administration": {
-        "members": [
-          "[parameters('admin')]"
-        ]
-      }
+      "isHnsEnabled": true,
+      "isLocalUserEnabled": true,
+      "isSftpEnabled": true
     },
     "dependsOn": [],
     "tags": {},
     "sku": {
-      "name": "[parameters('sku')]"
+      "name": "[parameters('storageAccountType')]"
     },
-    "kind": null,
+    "kind": "StorageV2",
     "_raw": {
-      "type": "Microsoft.PowerBIDedicated/capacities",
-      "apiVersion": "2018-09-01-preview",
-      "name": "[parameters('name')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2023-05-01",
+      "name": "[parameters('storageAccountName')]",
       "location": "[parameters('location')]",
       "sku": {
-        "name": "[parameters('sku')]"
+        "name": "[parameters('storageAccountType')]"
       },
+      "kind": "StorageV2",
       "properties": {
-        "administration": {
-          "members": [
-            "[parameters('admin')]"
-          ]
-        }
+        "isHnsEnabled": true,
+        "isLocalUserEnabled": true,
+        "isSftpEnabled": true
       }
     },
     "_metadata": {
-      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.powerbidedicated/power-bi-embedded/azuredeploy.json",
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-sftp/main.bicep",
       "is_mutated": false
     }
   },
   {
-    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Portal/dashboards/[concat('SHARED-DASHBOARD-', parameters('dashboardName'))]",
-    "type": "Microsoft.Portal/dashboards",
-    "apiVersion": "2020-09-01-preview",
-    "name": "[concat('SHARED-DASHBOARD-', parameters('dashboardName'))]",
-    "location": "[parameters('location')]",
-    "properties": {
-      "lenses": [
-        {
-          "order": 0,
-          "parts": [
-            {
-              "position": {
-                "x": 0,
-                "y": 0,
-                "colSpan": 4,
-                "rowSpan": 6
-              },
-              "metadata": {
-                "inputs": [
-                  {
-                    "name": "resourceGroup",
-                    "isOptional": true
-                  },
-                  {
-                    "name": "id",
-                    "value": "[resourceGroup().id]",
-                    "isOptional": true
-                  }
-                ],
-                "type": "Extension/HubsExtension/PartType/ResourceGroupMapPinnedPart"
-              }
-            },
-            {
-              "position": {
-                "x": 4,
-                "y": 0,
-                "rowSpan": 3,
-                "colSpan": 4
-              },
-              "metadata": {
-                "inputs": [],
-                "type": "Extension[azure]/HubsExtension/PartType/MarkdownPart",
-                "settings": {
-                  "content": {
-                    "settings": {
-                      "content": "__Customizations__\n\nUse this dashboard to create and share the operational views of services critical to the application performing. To customize simply pin components to the dashboard and then publish when you're done. Others will see your changes when you publish and share the dashboard.\n\nYou can customize this text too. It supports plain text, __Markdown__, and even limited HTML like images <img width='10' src='https://portal.azure.com/favicon.ico'/> and <a href='https://azure.microsoft.com' target='_blank'>links</a> that open in a new tab.\n",
-                      "title": "Operations",
-                      "subtitle": "[resourceGroup().name]"
-                    }
-                  }
-                }
-              }
-            }
-          ]
-        }
-      ],
-      "metadata": {
-        "model": {
-          "timeRange": {
-            "value": {
-              "relative": {
-                "duration": 24,
-                "timeUnit": 1
-              }
-            },
-            "type": "MsPortalFx.Composition.Configuration.ValueTypes.TimeRange"
-          }
-        }
-      }
-    },
-    "dependsOn": [],
-    "tags": {
-      "hidden-title": "[parameters('dashboardName')]"
-    },
-    "sku": null,
-    "kind": null,
-    "_raw": {
-      "apiVersion": "2020-09-01-preview",
-      "name": "[concat('SHARED-DASHBOARD-', parameters('dashboardName'))]",
-      "type": "Microsoft.Portal/dashboards",
-      "location": "[parameters('location')]",
-      "tags": {
-        "hidden-title": "[parameters('dashboardName')]"
-      },
-      "properties": {
-        "lenses": [
-          {
-            "order": 0,
-            "parts": [
-              {
-                "position": {
-                  "x": 0,
-                  "y": 0,
-                  "colSpan": 4,
-                  "rowSpan": 6
-                },
-                "metadata": {
-                  "inputs": [
-                    {
-                      "name": "resourceGroup",
-                      "isOptional": true
-                    },
-                    {
-                      "name": "id",
-                      "value": "[resourceGroup().id]",
-                      "isOptional": true
-                    }
-                  ],
-                  "type": "Extension/HubsExtension/PartType/ResourceGroupMapPinnedPart"
-                }
-              },
-              {
-                "position": {
-                  "x": 4,
-                  "y": 0,
-                  "rowSpan": 3,
-                  "colSpan": 4
-                },
-                "metadata": {
-                  "inputs": [],
-                  "type": "Extension[azure]/HubsExtension/PartType/MarkdownPart",
-                  "settings": {
-                    "content": {
-                      "settings": {
-                        "content": "__Customizations__\n\nUse this dashboard to create and share the operational views of services critical to the application performing. To customize simply pin components to the dashboard and then publish when you're done. Others will see your changes when you publish and share the dashboard.\n\nYou can customize this text too. It supports plain text, __Markdown__, and even limited HTML like images <img width='10' src='https://portal.azure.com/favicon.ico'/> and <a href='https://azure.microsoft.com' target='_blank'>links</a> that open in a new tab.\n",
-                        "title": "Operations",
-                        "subtitle": "[resourceGroup().name]"
-                      }
-                    }
-                  }
-                }
-              }
-            ]
-          }
-        ],
-        "metadata": {
-          "model": {
-            "timeRange": {
-              "value": {
-                "relative": {
-                  "duration": 24,
-                  "timeUnit": 1
-                }
-              },
-              "type": "MsPortalFx.Composition.Configuration.ValueTypes.TimeRange"
-            }
-          }
-        }
-      }
-    },
-    "_metadata": {
-      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.portal/default-shared-dashboard/azuredeploy.json",
-      "is_mutated": false
-    }
-  },
-  {
-    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Portal/dashboards/[parameters('dashboardName')]",
-    "type": "Microsoft.Portal/dashboards",
-    "apiVersion": "2020-09-01-preview",
-    "name": "[parameters('dashboardName')]",
-    "location": "[parameters('location')]",
-    "properties": {
-      "lenses": [
-        {
-          "order": 0,
-          "parts": [
-            {
-              "position": {
-                "x": 0,
-                "y": 0,
-                "rowSpan": 2,
-                "colSpan": 3
-              },
-              "metadata": {
-                "inputs": [],
-                "type": "Extension/HubsExtension/PartType/MarkdownPart",
-                "settings": {
-                  "content": {
-                    "settings": {
-                      "content": "## Azure Virtual Machines Overview\r\nNew team members should watch this video to get familiar with Azure Virtual Machines."
-                    }
-                  }
-                }
-              }
-            },
-            {
-              "position": {
-                "x": 3,
-                "y": 0,
-                "rowSpan": 4,
-                "colSpan": 8
-              },
-              "metadata": {
-                "inputs": [],
-                "type": "Extension/HubsExtension/PartType/MarkdownPart",
-                "settings": {
-                  "content": {
-                    "settings": {
-                      "content": "This is the team dashboard for the test VM we use on our team. Here are some useful links:\r\n\r\n1. [Create a Linux virtual machine](https://docs.microsoft.com/azure/virtual-machines/linux/quick-create-portal)\r\n1. [Create a Windows virtual machine](https://docs.microsoft.com/azure/virtual-machines/windows/quick-create-portal)\r\n1. [Create a virtual machine scale set](https://docs.microsoft.com/azure/virtual-machine-scale-sets/quick-create-portal)",
-                      "title": "Test VM Dashboard",
-                      "subtitle": "Contoso"
-                    }
-                  }
-                }
-              }
-            },
-            {
-              "position": {
-                "x": 0,
-                "y": 2,
-                "rowSpan": 2,
-                "colSpan": 3
-              },
-              "metadata": {
-                "inputs": [],
-                "type": "Extension/HubsExtension/PartType/VideoPart",
-                "settings": {
-                  "content": {
-                    "settings": {
-                      "src": "https://www.youtube.com/watch?v=rOiSRkxtTeU",
-                      "autoplay": false
-                    }
-                  }
-                }
-              }
-            },
-            {
-              "position": {
-                "x": 0,
-                "y": 4,
-                "rowSpan": 3,
-                "colSpan": 11
-              },
-              "metadata": {
-                "inputs": [
-                  {
-                    "name": "queryInputs",
-                    "value": {
-                      "timespan": {
-                        "duration": "PT1H"
-                      },
-                      "id": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]",
-                      "chartType": 0,
-                      "metrics": [
-                        {
-                          "name": "Percentage CPU",
-                          "resourceId": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]"
-                        }
-                      ]
-                    }
-                  }
-                ],
-                "type": "Extension/Microsoft_Azure_Monitoring/PartType/MetricsChartPart"
-              }
-            },
-            {
-              "position": {
-                "x": 0,
-                "y": 7,
-                "rowSpan": 2,
-                "colSpan": 3
-              },
-              "metadata": {
-                "inputs": [
-                  {
-                    "name": "queryInputs",
-                    "value": {
-                      "timespan": {
-                        "duration": "PT1H"
-                      },
-                      "id": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]",
-                      "chartType": 0,
-                      "metrics": [
-                        {
-                          "name": "Disk Read Operations/Sec",
-                          "resourceId": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]"
-                        },
-                        {
-                          "name": "Disk Write Operations/Sec",
-                          "resourceId": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]"
-                        }
-                      ]
-                    }
-                  }
-                ],
-                "type": "Extension/Microsoft_Azure_Monitoring/PartType/MetricsChartPart"
-              }
-            },
-            {
-              "position": {
-                "x": 3,
-                "y": 7,
-                "rowSpan": 2,
-                "colSpan": 3
-              },
-              "metadata": {
-                "inputs": [
-                  {
-                    "name": "queryInputs",
-                    "value": {
-                      "timespan": {
-                        "duration": "PT1H"
-                      },
-                      "id": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]",
-                      "chartType": 0,
-                      "metrics": [
-                        {
-                          "name": "Disk Read Bytes",
-                          "resourceId": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]"
-                        },
-                        {
-                          "name": "Disk Write Bytes",
-                          "resourceId": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]"
-                        }
-                      ]
-                    }
-                  }
-                ],
-                "type": "Extension/Microsoft_Azure_Monitoring/PartType/MetricsChartPart"
-              }
-            },
-            {
-              "position": {
-                "x": 6,
-                "y": 7,
-                "rowSpan": 2,
-                "colSpan": 3
-              },
-              "metadata": {
-                "inputs": [
-                  {
-                    "name": "queryInputs",
-                    "value": {
-                      "timespan": {
-                        "duration": "PT1H"
-                      },
-                      "id": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]",
-                      "chartType": 0,
-                      "metrics": [
-                        {
-                          "name": "Network In Total",
-                          "resourceId": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]"
-                        },
-                        {
-                          "name": "Network Out Total",
-                          "resourceId": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]"
-                        }
-                      ]
-                    }
-                  }
-                ],
-                "type": "Extension/Microsoft_Azure_Monitoring/PartType/MetricsChartPart"
-              }
-            },
-            {
-              "position": {
-                "x": 9,
-                "y": 7,
-                "rowSpan": 2,
-                "colSpan": 2
-              },
-              "metadata": {
-                "inputs": [
-                  {
-                    "name": "id",
-                    "value": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]"
-                  }
-                ],
-                "type": "Extension/Microsoft_Azure_Compute/PartType/VirtualMachinePart",
-                "asset": {
-                  "idInputName": "id",
-                  "type": "VirtualMachine"
-                }
-              }
-            }
-          ]
-        }
-      ]
-    },
-    "dependsOn": [],
-    "tags": {
-      "hidden-title": "[parameters('dashboardDisplayName')]"
-    },
-    "sku": null,
-    "kind": null,
-    "_raw": {
-      "type": "Microsoft.Portal/dashboards",
-      "apiVersion": "2020-09-01-preview",
-      "name": "[parameters('dashboardName')]",
-      "location": "[parameters('location')]",
-      "tags": {
-        "hidden-title": "[parameters('dashboardDisplayName')]"
-      },
-      "properties": {
-        "lenses": [
-          {
-            "order": 0,
-            "parts": [
-              {
-                "position": {
-                  "x": 0,
-                  "y": 0,
-                  "rowSpan": 2,
-                  "colSpan": 3
-                },
-                "metadata": {
-                  "inputs": [],
-                  "type": "Extension/HubsExtension/PartType/MarkdownPart",
-                  "settings": {
-                    "content": {
-                      "settings": {
-                        "content": "## Azure Virtual Machines Overview\r\nNew team members should watch this video to get familiar with Azure Virtual Machines."
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                "position": {
-                  "x": 3,
-                  "y": 0,
-                  "rowSpan": 4,
-                  "colSpan": 8
-                },
-                "metadata": {
-                  "inputs": [],
-                  "type": "Extension/HubsExtension/PartType/MarkdownPart",
-                  "settings": {
-                    "content": {
-                      "settings": {
-                        "content": "This is the team dashboard for the test VM we use on our team. Here are some useful links:\r\n\r\n1. [Create a Linux virtual machine](https://docs.microsoft.com/azure/virtual-machines/linux/quick-create-portal)\r\n1. [Create a Windows virtual machine](https://docs.microsoft.com/azure/virtual-machines/windows/quick-create-portal)\r\n1. [Create a virtual machine scale set](https://docs.microsoft.com/azure/virtual-machine-scale-sets/quick-create-portal)",
-                        "title": "Test VM Dashboard",
-                        "subtitle": "Contoso"
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                "position": {
-                  "x": 0,
-                  "y": 2,
-                  "rowSpan": 2,
-                  "colSpan": 3
-                },
-                "metadata": {
-                  "inputs": [],
-                  "type": "Extension/HubsExtension/PartType/VideoPart",
-                  "settings": {
-                    "content": {
-                      "settings": {
-                        "src": "https://www.youtube.com/watch?v=rOiSRkxtTeU",
-                        "autoplay": false
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                "position": {
-                  "x": 0,
-                  "y": 4,
-                  "rowSpan": 3,
-                  "colSpan": 11
-                },
-                "metadata": {
-                  "inputs": [
-                    {
-                      "name": "queryInputs",
-                      "value": {
-                        "timespan": {
-                          "duration": "PT1H"
-                        },
-                        "id": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]",
-                        "chartType": 0,
-                        "metrics": [
-                          {
-                            "name": "Percentage CPU",
-                            "resourceId": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]"
-                          }
-                        ]
-                      }
-                    }
-                  ],
-                  "type": "Extension/Microsoft_Azure_Monitoring/PartType/MetricsChartPart"
-                }
-              },
-              {
-                "position": {
-                  "x": 0,
-                  "y": 7,
-                  "rowSpan": 2,
-                  "colSpan": 3
-                },
-                "metadata": {
-                  "inputs": [
-                    {
-                      "name": "queryInputs",
-                      "value": {
-                        "timespan": {
-                          "duration": "PT1H"
-                        },
-                        "id": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]",
-                        "chartType": 0,
-                        "metrics": [
-                          {
-                            "name": "Disk Read Operations/Sec",
-                            "resourceId": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]"
-                          },
-                          {
-                            "name": "Disk Write Operations/Sec",
-                            "resourceId": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]"
-                          }
-                        ]
-                      }
-                    }
-                  ],
-                  "type": "Extension/Microsoft_Azure_Monitoring/PartType/MetricsChartPart"
-                }
-              },
-              {
-                "position": {
-                  "x": 3,
-                  "y": 7,
-                  "rowSpan": 2,
-                  "colSpan": 3
-                },
-                "metadata": {
-                  "inputs": [
-                    {
-                      "name": "queryInputs",
-                      "value": {
-                        "timespan": {
-                          "duration": "PT1H"
-                        },
-                        "id": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]",
-                        "chartType": 0,
-                        "metrics": [
-                          {
-                            "name": "Disk Read Bytes",
-                            "resourceId": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]"
-                          },
-                          {
-                            "name": "Disk Write Bytes",
-                            "resourceId": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]"
-                          }
-                        ]
-                      }
-                    }
-                  ],
-                  "type": "Extension/Microsoft_Azure_Monitoring/PartType/MetricsChartPart"
-                }
-              },
-              {
-                "position": {
-                  "x": 6,
-                  "y": 7,
-                  "rowSpan": 2,
-                  "colSpan": 3
-                },
-                "metadata": {
-                  "inputs": [
-                    {
-                      "name": "queryInputs",
-                      "value": {
-                        "timespan": {
-                          "duration": "PT1H"
-                        },
-                        "id": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]",
-                        "chartType": 0,
-                        "metrics": [
-                          {
-                            "name": "Network In Total",
-                            "resourceId": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]"
-                          },
-                          {
-                            "name": "Network Out Total",
-                            "resourceId": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]"
-                          }
-                        ]
-                      }
-                    }
-                  ],
-                  "type": "Extension/Microsoft_Azure_Monitoring/PartType/MetricsChartPart"
-                }
-              },
-              {
-                "position": {
-                  "x": 9,
-                  "y": 7,
-                  "rowSpan": 2,
-                  "colSpan": 2
-                },
-                "metadata": {
-                  "inputs": [
-                    {
-                      "name": "id",
-                      "value": "[resourceId(parameters('virtualMachineResourceGroup'), 'Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]"
-                    }
-                  ],
-                  "type": "Extension/Microsoft_Azure_Compute/PartType/VirtualMachinePart",
-                  "asset": {
-                    "idInputName": "id",
-                    "type": "VirtualMachine"
-                  }
-                }
-              }
-            ]
-          }
-        ]
-      }
-    },
-    "_metadata": {
-      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.portal/azure-portal-dashboard/azuredeploy.json",
-      "is_mutated": false
-    }
-  },
-  {
-    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Kusto/clusters/databases/[concat(parameters('clusters_kustocluster_name'), '/', parameters('databases_kustodb_name'))]",
-    "type": "Microsoft.Kusto/clusters/databases",
-    "apiVersion": "2020-06-14",
-    "name": "[concat(parameters('clusters_kustocluster_name'), '/', parameters('databases_kustodb_name'))]",
-    "location": "[parameters('location')]",
-    "properties": {
-      "softDeletePeriodInDays": 365,
-      "hotCachePeriodInDays": 31
-    },
-    "dependsOn": [
-      "[resourceId('Microsoft.Kusto/clusters', parameters('clusters_kustocluster_name'))]"
-    ],
-    "tags": {},
-    "sku": null,
-    "kind": null,
-    "_raw": {
-      "name": "[concat(parameters('clusters_kustocluster_name'), '/', parameters('databases_kustodb_name'))]",
-      "type": "Microsoft.Kusto/clusters/databases",
-      "apiVersion": "2020-06-14",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Kusto/clusters', parameters('clusters_kustocluster_name'))]"
-      ],
-      "properties": {
-        "softDeletePeriodInDays": 365,
-        "hotCachePeriodInDays": 31
-      }
-    },
-    "_metadata": {
-      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-cluster-database/azuredeploy.json",
-      "is_mutated": false
-    }
-  },
-  {
-    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Kusto/clusters/[parameters('clusters_kustocluster_name')]",
-    "type": "Microsoft.Kusto/clusters",
-    "apiVersion": "2020-06-14",
-    "name": "[parameters('clusters_kustocluster_name')]",
-    "location": "[parameters('location')]",
-    "properties": {},
-    "dependsOn": [],
-    "tags": {
-      "Created By": "GitHub quickstart template"
-    },
-    "sku": {
-      "name": "Standard_D8_v3",
-      "tier": "Standard",
-      "capacity": 2
-    },
-    "kind": null,
-    "_raw": {
-      "name": "[parameters('clusters_kustocluster_name')]",
-      "type": "Microsoft.Kusto/clusters",
-      "sku": {
-        "name": "Standard_D8_v3",
-        "tier": "Standard",
-        "capacity": 2
-      },
-      "apiVersion": "2020-06-14",
-      "location": "[parameters('location')]",
-      "tags": {
-        "Created By": "GitHub quickstart template"
-      }
-    },
-    "_metadata": {
-      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-cluster-database/azuredeploy.json",
-      "is_mutated": false
-    }
-  },
-  {
-    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/blobServices/containers/[format('{0}/{1}/{2}', parameters('storageAccountName'), 'default', parameters('storageContainerName'))]",
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/blobServices/containers/[format('{0}/default/{1}', parameters('storageAccountName'), parameters('homeDirectory'))]",
     "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-    "apiVersion": "2023-01-01",
-    "name": "[format('{0}/{1}/{2}', parameters('storageAccountName'), 'default', parameters('storageContainerName'))]",
+    "apiVersion": "2023-05-01",
+    "name": "[format('{0}/default/{1}', parameters('storageAccountName'), parameters('homeDirectory'))]",
     "location": null,
     "properties": {
       "publicAccess": "None"
     },
     "dependsOn": [
-      "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]"
+      "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
     ],
     "tags": {},
     "sku": null,
     "kind": null,
     "_raw": {
       "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-      "apiVersion": "2023-01-01",
-      "name": "[format('{0}/{1}/{2}', parameters('storageAccountName'), 'default', parameters('storageContainerName'))]",
+      "apiVersion": "2023-05-01",
+      "name": "[format('{0}/default/{1}', parameters('storageAccountName'), parameters('homeDirectory'))]",
       "properties": {
         "publicAccess": "None"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]"
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
       ]
     },
     "_metadata": {
-      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-sftp/main.bicep",
+      "is_mutated": false
+    }
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/localUsers/[format('{0}/{1}', parameters('storageAccountName'), parameters('userName'))]",
+    "type": "Microsoft.Storage/storageAccounts/localUsers",
+    "apiVersion": "2023-05-01",
+    "name": "[format('{0}/{1}', parameters('storageAccountName'), parameters('userName'))]",
+    "location": null,
+    "properties": {
+      "permissionScopes": [
+        {
+          "permissions": "rcwdl",
+          "service": "blob",
+          "resourceName": "[parameters('homeDirectory')]"
+        }
+      ],
+      "homeDirectory": "[parameters('homeDirectory')]",
+      "sshAuthorizedKeys": "[if(empty(parameters('publicKey')), null(), createArray(createObject('description', format('{0} public key', parameters('userName')), 'key', parameters('publicKey'))))]",
+      "hasSharedKey": false
+    },
+    "dependsOn": [
+      "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+    ],
+    "tags": {},
+    "sku": null,
+    "kind": null,
+    "_raw": {
+      "type": "Microsoft.Storage/storageAccounts/localUsers",
+      "apiVersion": "2023-05-01",
+      "name": "[format('{0}/{1}', parameters('storageAccountName'), parameters('userName'))]",
+      "properties": {
+        "permissionScopes": [
+          {
+            "permissions": "rcwdl",
+            "service": "blob",
+            "resourceName": "[parameters('homeDirectory')]"
+          }
+        ],
+        "homeDirectory": "[parameters('homeDirectory')]",
+        "sshAuthorizedKeys": "[if(empty(parameters('publicKey')), null(), createArray(createObject('description', format('{0} public key', parameters('userName')), 'key', parameters('publicKey'))))]",
+        "hasSharedKey": false
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+      ]
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-sftp/main.bicep",
+      "is_mutated": false
+    }
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]",
+    "type": "Microsoft.Storage/storageAccounts",
+    "apiVersion": "2023-01-01",
+    "name": "[parameters('storageAccountName')]",
+    "location": "[parameters('location')]",
+    "properties": {
+      "accessTier": "Hot"
+    },
+    "dependsOn": [],
+    "tags": {},
+    "sku": {
+      "name": "Standard_LRS"
+    },
+    "kind": "StorageV2",
+    "_raw": {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2023-01-01",
+      "name": "[parameters('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "accessTier": "Hot"
+      }
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-multi-blob-container/main.bicep",
       "is_mutated": false
     }
   },
@@ -780,268 +171,37 @@
       ]
     },
     "_metadata": {
-      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-multi-blob-container/main.bicep",
       "is_mutated": false
     }
   },
   {
-    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.EventHub/namespaces/eventhubs/consumergroups/[format('{0}/{1}/{2}', parameters('eventHubNamespaceName'), parameters('eventHubName'), 'kustoConsumerGroup')]",
-    "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
-    "apiVersion": "2021-11-01",
-    "name": "[format('{0}/{1}/{2}', parameters('eventHubNamespaceName'), parameters('eventHubName'), 'kustoConsumerGroup')]",
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/blobServices/containers/[format('{0}/{1}/{2}', parameters('storageAccountName'), 'default', format('{0}{1}', parameters('containerPrefix'), range(0, parameters('numberOfContainers'))[copyIndex()]))]",
+    "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+    "apiVersion": "2023-01-01",
+    "name": "[format('{0}/{1}/{2}', parameters('storageAccountName'), 'default', format('{0}{1}', parameters('containerPrefix'), range(0, parameters('numberOfContainers'))[copyIndex()]))]",
     "location": null,
     "properties": {},
     "dependsOn": [
-      "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubNamespaceName'), parameters('eventHubName'))]"
+      "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]"
     ],
     "tags": {},
     "sku": null,
     "kind": null,
     "_raw": {
-      "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
-      "apiVersion": "2021-11-01",
-      "name": "[format('{0}/{1}/{2}', parameters('eventHubNamespaceName'), parameters('eventHubName'), 'kustoConsumerGroup')]",
-      "properties": {},
+      "copy": {
+        "name": "containers",
+        "count": "[length(range(0, parameters('numberOfContainers')))]"
+      },
+      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "apiVersion": "2023-01-01",
+      "name": "[format('{0}/{1}/{2}', parameters('storageAccountName'), 'default', format('{0}{1}', parameters('containerPrefix'), range(0, parameters('numberOfContainers'))[copyIndex()]))]",
       "dependsOn": [
-        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubNamespaceName'), parameters('eventHubName'))]"
+        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]"
       ]
     },
     "_metadata": {
-      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
-      "is_mutated": false
-    }
-  },
-  {
-    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.EventHub/namespaces/eventhubs/[format('{0}/{1}', parameters('eventHubNamespaceName'), parameters('eventHubName'))]",
-    "type": "Microsoft.EventHub/namespaces/eventhubs",
-    "apiVersion": "2021-11-01",
-    "name": "[format('{0}/{1}', parameters('eventHubNamespaceName'), parameters('eventHubName'))]",
-    "location": null,
-    "properties": {
-      "messageRetentionInDays": 2,
-      "partitionCount": 2
-    },
-    "dependsOn": [
-      "[resourceId('Microsoft.EventHub/namespaces', parameters('eventHubNamespaceName'))]"
-    ],
-    "tags": {},
-    "sku": null,
-    "kind": null,
-    "_raw": {
-      "type": "Microsoft.EventHub/namespaces/eventhubs",
-      "apiVersion": "2021-11-01",
-      "name": "[format('{0}/{1}', parameters('eventHubNamespaceName'), parameters('eventHubName'))]",
-      "properties": {
-        "messageRetentionInDays": 2,
-        "partitionCount": 2
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.EventHub/namespaces', parameters('eventHubNamespaceName'))]"
-      ]
-    },
-    "_metadata": {
-      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
-      "is_mutated": false
-    }
-  },
-  {
-    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.EventGrid/systemTopics/eventSubscriptions/[format('{0}/{1}', parameters('eventGridTopicName'), parameters('eventGridSubscriptionName'))]",
-    "type": "Microsoft.EventGrid/systemTopics/eventSubscriptions",
-    "apiVersion": "2023-12-15-preview",
-    "name": "[format('{0}/{1}', parameters('eventGridTopicName'), parameters('eventGridSubscriptionName'))]",
-    "location": null,
-    "properties": {
-      "deliveryWithResourceIdentity": {
-        "destination": {
-          "endpointType": "EventHub",
-          "properties": {
-            "resourceId": "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubNamespaceName'), parameters('eventHubName'))]"
-          }
-        },
-        "identity": {
-          "type": "SystemAssigned"
-        }
-      },
-      "eventDeliverySchema": "EventGridSchema",
-      "filter": {
-        "subjectBeginsWith": "[format('/blobServices/default/containers/{0}', parameters('storageContainerName'))]",
-        "includedEventTypes": [
-          "Microsoft.Storage.BlobCreated"
-        ],
-        "enableAdvancedFilteringOnArrays": true
-      },
-      "retryPolicy": {
-        "maxDeliveryAttempts": 30,
-        "eventTimeToLiveInMinutes": 1440
-      }
-    },
-    "dependsOn": [
-      "[resourceId('Microsoft.EventGrid/systemTopics', parameters('eventGridTopicName'))]",
-      "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubNamespaceName'), parameters('eventHubName'))]",
-      "[resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', parameters('storageAccountName'), 'default', parameters('storageContainerName'))]"
-    ],
-    "tags": {},
-    "sku": null,
-    "kind": null,
-    "_raw": {
-      "type": "Microsoft.EventGrid/systemTopics/eventSubscriptions",
-      "apiVersion": "2023-12-15-preview",
-      "name": "[format('{0}/{1}', parameters('eventGridTopicName'), parameters('eventGridSubscriptionName'))]",
-      "properties": {
-        "deliveryWithResourceIdentity": {
-          "destination": {
-            "endpointType": "EventHub",
-            "properties": {
-              "resourceId": "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubNamespaceName'), parameters('eventHubName'))]"
-            }
-          },
-          "identity": {
-            "type": "SystemAssigned"
-          }
-        },
-        "eventDeliverySchema": "EventGridSchema",
-        "filter": {
-          "subjectBeginsWith": "[format('/blobServices/default/containers/{0}', parameters('storageContainerName'))]",
-          "includedEventTypes": [
-            "Microsoft.Storage.BlobCreated"
-          ],
-          "enableAdvancedFilteringOnArrays": true
-        },
-        "retryPolicy": {
-          "maxDeliveryAttempts": 30,
-          "eventTimeToLiveInMinutes": 1440
-        }
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.EventGrid/systemTopics', parameters('eventGridTopicName'))]",
-        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubNamespaceName'), parameters('eventHubName'))]",
-        "[resourceId('Microsoft.Storage/storageAccounts/blobServices/containers', parameters('storageAccountName'), 'default', parameters('storageContainerName'))]"
-      ]
-    },
-    "_metadata": {
-      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
-      "is_mutated": false
-    }
-  },
-  {
-    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Kusto/clusters/databases/scripts/[format('{0}/{1}/{2}', parameters('clusterName'), parameters('databaseName'), 'db-script')]",
-    "type": "Microsoft.Kusto/clusters/databases/scripts",
-    "apiVersion": "2023-08-15",
-    "name": "[format('{0}/{1}/{2}', parameters('clusterName'), parameters('databaseName'), 'db-script')]",
-    "location": null,
-    "properties": {
-      "scriptContent": "[variables('$fxv#0')]",
-      "continueOnErrors": false
-    },
-    "dependsOn": [
-      "[resourceId('Microsoft.Kusto/clusters/databases', parameters('clusterName'), parameters('databaseName'))]"
-    ],
-    "tags": {},
-    "sku": null,
-    "kind": null,
-    "_raw": {
-      "type": "Microsoft.Kusto/clusters/databases/scripts",
-      "apiVersion": "2023-08-15",
-      "name": "[format('{0}/{1}/{2}', parameters('clusterName'), parameters('databaseName'), 'db-script')]",
-      "properties": {
-        "scriptContent": "[variables('$fxv#0')]",
-        "continueOnErrors": false
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Kusto/clusters/databases', parameters('clusterName'), parameters('databaseName'))]"
-      ]
-    },
-    "_metadata": {
-      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
-      "is_mutated": false
-    }
-  },
-  {
-    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Kusto/clusters/databases/dataConnections/[format('{0}/{1}/{2}', parameters('clusterName'), parameters('databaseName'), 'eventConnection')]",
-    "type": "Microsoft.Kusto/clusters/databases/dataConnections",
-    "apiVersion": "2023-08-15",
-    "name": "[format('{0}/{1}/{2}', parameters('clusterName'), parameters('databaseName'), 'eventConnection')]",
-    "location": "[parameters('location')]",
-    "properties": {
-      "blobStorageEventType": "Microsoft.Storage.BlobCreated",
-      "consumerGroup": "kustoConsumerGroup",
-      "dataFormat": "csv",
-      "eventGridResourceId": "[resourceId('Microsoft.EventGrid/systemTopics/eventSubscriptions', parameters('eventGridTopicName'), parameters('eventGridSubscriptionName'))]",
-      "eventHubResourceId": "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubNamespaceName'), parameters('eventHubName'))]",
-      "ignoreFirstRecord": true,
-      "managedIdentityResourceId": "[resourceId('Microsoft.Kusto/clusters', parameters('clusterName'))]",
-      "storageAccountResourceId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
-      "tableName": "People"
-    },
-    "dependsOn": [
-      "[extensionResourceId(resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubNamespaceName'), parameters('eventHubName')), 'Microsoft.Authorization/roleAssignments', guid(parameters('clusterName'), parameters('eventHubName'), 'Azure Event Hubs Data Receiver'))]",
-      "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubNamespaceName'), parameters('eventHubName'))]",
-      "[resourceId('Microsoft.EventHub/namespaces/eventhubs/consumergroups', parameters('eventHubNamespaceName'), parameters('eventHubName'), 'kustoConsumerGroup')]",
-      "[resourceId('Microsoft.Kusto/clusters/databases', parameters('clusterName'), parameters('databaseName'))]",
-      "[resourceId('Microsoft.Kusto/clusters/databases/scripts', parameters('clusterName'), parameters('databaseName'), 'db-script')]",
-      "[resourceId('Microsoft.EventGrid/systemTopics/eventSubscriptions', parameters('eventGridTopicName'), parameters('eventGridSubscriptionName'))]",
-      "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
-    ],
-    "tags": {},
-    "sku": null,
-    "kind": "EventGrid",
-    "_raw": {
-      "type": "Microsoft.Kusto/clusters/databases/dataConnections",
-      "apiVersion": "2023-08-15",
-      "name": "[format('{0}/{1}/{2}', parameters('clusterName'), parameters('databaseName'), 'eventConnection')]",
-      "location": "[parameters('location')]",
-      "kind": "EventGrid",
-      "properties": {
-        "blobStorageEventType": "Microsoft.Storage.BlobCreated",
-        "consumerGroup": "kustoConsumerGroup",
-        "dataFormat": "csv",
-        "eventGridResourceId": "[resourceId('Microsoft.EventGrid/systemTopics/eventSubscriptions', parameters('eventGridTopicName'), parameters('eventGridSubscriptionName'))]",
-        "eventHubResourceId": "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubNamespaceName'), parameters('eventHubName'))]",
-        "ignoreFirstRecord": true,
-        "managedIdentityResourceId": "[resourceId('Microsoft.Kusto/clusters', parameters('clusterName'))]",
-        "storageAccountResourceId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
-        "tableName": "People"
-      },
-      "dependsOn": [
-        "[extensionResourceId(resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubNamespaceName'), parameters('eventHubName')), 'Microsoft.Authorization/roleAssignments', guid(parameters('clusterName'), parameters('eventHubName'), 'Azure Event Hubs Data Receiver'))]",
-        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubNamespaceName'), parameters('eventHubName'))]",
-        "[resourceId('Microsoft.EventHub/namespaces/eventhubs/consumergroups', parameters('eventHubNamespaceName'), parameters('eventHubName'), 'kustoConsumerGroup')]",
-        "[resourceId('Microsoft.Kusto/clusters/databases', parameters('clusterName'), parameters('databaseName'))]",
-        "[resourceId('Microsoft.Kusto/clusters/databases/scripts', parameters('clusterName'), parameters('databaseName'), 'db-script')]",
-        "[resourceId('Microsoft.EventGrid/systemTopics/eventSubscriptions', parameters('eventGridTopicName'), parameters('eventGridSubscriptionName'))]",
-        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
-      ]
-    },
-    "_metadata": {
-      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
-      "is_mutated": false
-    }
-  },
-  {
-    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Kusto/clusters/databases/[format('{0}/{1}', parameters('clusterName'), parameters('databaseName'))]",
-    "type": "Microsoft.Kusto/clusters/databases",
-    "apiVersion": "2023-08-15",
-    "name": "[format('{0}/{1}', parameters('clusterName'), parameters('databaseName'))]",
-    "location": "[parameters('location')]",
-    "properties": {},
-    "dependsOn": [
-      "[resourceId('Microsoft.Kusto/clusters', parameters('clusterName'))]"
-    ],
-    "tags": {},
-    "sku": null,
-    "kind": "ReadWrite",
-    "_raw": {
-      "type": "Microsoft.Kusto/clusters/databases",
-      "apiVersion": "2023-08-15",
-      "name": "[format('{0}/{1}', parameters('clusterName'), parameters('databaseName'))]",
-      "location": "[parameters('location')]",
-      "kind": "ReadWrite",
-      "dependsOn": [
-        "[resourceId('Microsoft.Kusto/clusters', parameters('clusterName'))]"
-      ]
-    },
-    "_metadata": {
-      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-multi-blob-container/main.bicep",
       "is_mutated": false
     }
   },
@@ -1052,7 +212,7 @@
     "name": "[parameters('storageAccountName')]",
     "location": "[parameters('location')]",
     "properties": {
-      "isHnsEnabled": true
+      "accessTier": "Hot"
     },
     "dependsOn": [],
     "tags": {},
@@ -1070,55 +230,366 @@
       },
       "kind": "StorageV2",
       "properties": {
-        "isHnsEnabled": true
+        "accessTier": "Hot"
       }
     },
     "_metadata": {
-      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-blob-container/main.bicep",
       "is_mutated": false
     }
   },
   {
-    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.EventHub/namespaces/[parameters('eventHubNamespaceName')]",
-    "type": "Microsoft.EventHub/namespaces",
-    "apiVersion": "2021-11-01",
-    "name": "[parameters('eventHubNamespaceName')]",
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/blobServices/[format('{0}/{1}', parameters('storageAccountName'), 'default')]",
+    "type": "Microsoft.Storage/storageAccounts/blobServices",
+    "apiVersion": "2023-01-01",
+    "name": "[format('{0}/{1}', parameters('storageAccountName'), 'default')]",
+    "location": null,
+    "properties": {},
+    "dependsOn": [
+      "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+    ],
+    "tags": {},
+    "sku": null,
+    "kind": null,
+    "_raw": {
+      "type": "Microsoft.Storage/storageAccounts/blobServices",
+      "apiVersion": "2023-01-01",
+      "name": "[format('{0}/{1}', parameters('storageAccountName'), 'default')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+      ]
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-blob-container/main.bicep",
+      "is_mutated": false
+    }
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/blobServices/containers/[format('{0}/{1}/{2}', parameters('storageAccountName'), 'default', parameters('containerName'))]",
+    "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+    "apiVersion": "2023-01-01",
+    "name": "[format('{0}/{1}/{2}', parameters('storageAccountName'), 'default', parameters('containerName'))]",
+    "location": null,
+    "properties": {},
+    "dependsOn": [
+      "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]"
+    ],
+    "tags": {},
+    "sku": null,
+    "kind": null,
+    "_raw": {
+      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "apiVersion": "2023-01-01",
+      "name": "[format('{0}/{1}/{2}', parameters('storageAccountName'), 'default', parameters('containerName'))]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]"
+      ]
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-blob-container/main.bicep",
+      "is_mutated": false
+    }
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]",
+    "type": "Microsoft.Storage/storageAccounts",
+    "apiVersion": "2021-04-01",
+    "name": "[parameters('storageAccountName')]",
+    "location": "[parameters('location')]",
+    "properties": {
+      "encryption": {
+        "keySource": "Microsoft.Storage",
+        "services": {
+          "blob": {
+            "enabled": "[parameters('blobEncryptionEnabled')]"
+          }
+        }
+      }
+    },
+    "dependsOn": [],
+    "tags": {},
+    "sku": {
+      "name": "[parameters('storageAccountType')]"
+    },
+    "kind": "Storage",
+    "_raw": {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2021-04-01",
+      "name": "[parameters('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('storageAccountType')]"
+      },
+      "kind": "Storage",
+      "properties": {
+        "encryption": {
+          "keySource": "Microsoft.Storage",
+          "services": {
+            "blob": {
+              "enabled": "[parameters('blobEncryptionEnabled')]"
+            }
+          }
+        }
+      }
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-account-service-encryption-create/main.bicep",
+      "is_mutated": false
+    }
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]",
+    "type": "Microsoft.Storage/storageAccounts",
+    "apiVersion": "2022-09-01",
+    "name": "[parameters('storageAccountName')]",
     "location": "[parameters('location')]",
     "properties": {},
     "dependsOn": [],
     "tags": {},
     "sku": {
-      "capacity": 1,
-      "name": "Standard",
-      "tier": "Standard"
+      "name": "[parameters('storageAccountType')]"
     },
-    "kind": null,
+    "kind": "StorageV2",
     "_raw": {
-      "type": "Microsoft.EventHub/namespaces",
-      "apiVersion": "2021-11-01",
-      "name": "[parameters('eventHubNamespaceName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2022-09-01",
+      "name": "[parameters('storageAccountName')]",
       "location": "[parameters('location')]",
       "sku": {
-        "capacity": 1,
-        "name": "Standard",
-        "tier": "Standard"
+        "name": "[parameters('storageAccountType')]"
       },
+      "kind": "StorageV2",
       "properties": {}
     },
     "_metadata": {
-      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-account-create/main.bicep",
       "is_mutated": false
     }
   },
   {
-    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.EventGrid/systemTopics/[parameters('eventGridTopicName')]",
-    "type": "Microsoft.EventGrid/systemTopics",
-    "apiVersion": "2023-12-15-preview",
-    "name": "[parameters('eventGridTopicName')]",
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]",
+    "type": "Microsoft.Storage/storageAccounts",
+    "apiVersion": "2021-06-01",
+    "name": "[parameters('storageAccountName')]",
+    "location": "[parameters('location')]",
+    "properties": {},
+    "dependsOn": [],
+    "tags": {},
+    "sku": {
+      "name": "[parameters('storageSku')]"
+    },
+    "kind": "StorageV2",
+    "_raw": {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2021-06-01",
+      "name": "[parameters('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "kind": "StorageV2",
+      "sku": {
+        "name": "[parameters('storageSku')]"
+      }
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-static-website/main.bicep",
+      "is_mutated": false
+    }
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/DeploymentScript",
+    "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+    "apiVersion": "2018-11-30",
+    "name": "DeploymentScript",
+    "location": "[parameters('location')]",
+    "properties": {},
+    "dependsOn": [],
+    "tags": {},
+    "sku": null,
+    "kind": null,
+    "_raw": {
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "apiVersion": "2018-11-30",
+      "name": "DeploymentScript",
+      "location": "[parameters('location')]"
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-static-website/main.bicep",
+      "is_mutated": false
+    }
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Authorization/roleAssignments/[guid(resourceGroup().id, resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'DeploymentScript'), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '17d1049b-9a84-46fb-8f53-869881c3d3ab'))]",
+    "type": "Microsoft.Authorization/roleAssignments",
+    "apiVersion": "2020-04-01-preview",
+    "name": "[guid(resourceGroup().id, resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'DeploymentScript'), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '17d1049b-9a84-46fb-8f53-869881c3d3ab'))]",
+    "location": null,
+    "properties": {
+      "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '17d1049b-9a84-46fb-8f53-869881c3d3ab')]",
+      "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'DeploymentScript'), '2018-11-30').principalId]",
+      "principalType": "ServicePrincipal"
+    },
+    "dependsOn": [
+      "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'DeploymentScript')]",
+      "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+    ],
+    "tags": {},
+    "sku": null,
+    "kind": null,
+    "_raw": {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2020-04-01-preview",
+      "scope": "[format('Microsoft.Storage/storageAccounts/{0}', parameters('storageAccountName'))]",
+      "name": "[guid(resourceGroup().id, resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'DeploymentScript'), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '17d1049b-9a84-46fb-8f53-869881c3d3ab'))]",
+      "properties": {
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '17d1049b-9a84-46fb-8f53-869881c3d3ab')]",
+        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'DeploymentScript'), '2018-11-30').principalId]",
+        "principalType": "ServicePrincipal"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'DeploymentScript')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+      ]
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-static-website/main.bicep",
+      "is_mutated": false
+    }
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Resources/deploymentScripts/deploymentScript",
+    "type": "Microsoft.Resources/deploymentScripts",
+    "apiVersion": "2020-10-01",
+    "name": "deploymentScript",
     "location": "[parameters('location')]",
     "properties": {
-      "source": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
-      "topicType": "Microsoft.Storage.StorageAccounts"
+      "azPowerShellVersion": "3.0",
+      "scriptContent": "[variables('$fxv#0')]",
+      "retentionInterval": "PT4H",
+      "environmentVariables": [
+        {
+          "name": "ResourceGroupName",
+          "value": "[resourceGroup().name]"
+        },
+        {
+          "name": "StorageAccountName",
+          "value": "[parameters('storageAccountName')]"
+        },
+        {
+          "name": "IndexDocumentPath",
+          "value": "[parameters('indexDocumentPath')]"
+        },
+        {
+          "name": "IndexDocumentContents",
+          "value": "[parameters('indexDocumentContents')]"
+        },
+        {
+          "name": "ErrorDocument404Path",
+          "value": "[parameters('errorDocument404Path')]"
+        },
+        {
+          "name": "ErrorDocument404Contents",
+          "value": "[parameters('errorDocument404Contents')]"
+        }
+      ]
+    },
+    "dependsOn": [
+      "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'DeploymentScript')]",
+      "[extensionResourceId(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), 'Microsoft.Authorization/roleAssignments', guid(resourceGroup().id, resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'DeploymentScript'), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '17d1049b-9a84-46fb-8f53-869881c3d3ab')))]",
+      "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+    ],
+    "tags": {},
+    "sku": null,
+    "kind": "AzurePowerShell",
+    "_raw": {
+      "type": "Microsoft.Resources/deploymentScripts",
+      "apiVersion": "2020-10-01",
+      "name": "deploymentScript",
+      "location": "[parameters('location')]",
+      "kind": "AzurePowerShell",
+      "identity": {
+        "type": "UserAssigned",
+        "userAssignedIdentities": {
+          "[format('{0}', resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'DeploymentScript'))]": {}
+        }
+      },
+      "properties": {
+        "azPowerShellVersion": "3.0",
+        "scriptContent": "[variables('$fxv#0')]",
+        "retentionInterval": "PT4H",
+        "environmentVariables": [
+          {
+            "name": "ResourceGroupName",
+            "value": "[resourceGroup().name]"
+          },
+          {
+            "name": "StorageAccountName",
+            "value": "[parameters('storageAccountName')]"
+          },
+          {
+            "name": "IndexDocumentPath",
+            "value": "[parameters('indexDocumentPath')]"
+          },
+          {
+            "name": "IndexDocumentContents",
+            "value": "[parameters('indexDocumentContents')]"
+          },
+          {
+            "name": "ErrorDocument404Path",
+            "value": "[parameters('errorDocument404Path')]"
+          },
+          {
+            "name": "ErrorDocument404Contents",
+            "value": "[parameters('errorDocument404Contents')]"
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'DeploymentScript')]",
+        "[extensionResourceId(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), 'Microsoft.Authorization/roleAssignments', guid(resourceGroup().id, resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'DeploymentScript'), subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '17d1049b-9a84-46fb-8f53-869881c3d3ab')))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+      ]
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-static-website/main.bicep",
+      "is_mutated": false
+    }
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]",
+    "type": "Microsoft.Storage/storageAccounts",
+    "apiVersion": "2021-04-01",
+    "name": "[parameters('storageAccountName')]",
+    "location": "[parameters('location')]",
+    "properties": {},
+    "dependsOn": [],
+    "tags": {},
+    "sku": {
+      "name": "[parameters('storageAccountReplication')]"
+    },
+    "kind": "StorageV2",
+    "_raw": {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2021-04-01",
+      "name": "[parameters('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('storageAccountReplication')]"
+      },
+      "kind": "StorageV2",
+      "properties": {}
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-advanced-threat-protection-create/main.bicep",
+      "is_mutated": false
+    }
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Security/advancedThreatProtectionSettings/current",
+    "type": "Microsoft.Security/advancedThreatProtectionSettings",
+    "apiVersion": "2019-01-01",
+    "name": "current",
+    "location": null,
+    "properties": {
+      "isEnabled": true
     },
     "dependsOn": [
       "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
@@ -1127,182 +598,330 @@
     "sku": null,
     "kind": null,
     "_raw": {
-      "type": "Microsoft.EventGrid/systemTopics",
-      "apiVersion": "2023-12-15-preview",
-      "name": "[parameters('eventGridTopicName')]",
-      "location": "[parameters('location')]",
-      "identity": {
-        "type": "SystemAssigned"
-      },
+      "condition": "[parameters('advancedThreatProtectionEnabled')]",
+      "type": "Microsoft.Security/advancedThreatProtectionSettings",
+      "apiVersion": "2019-01-01",
+      "scope": "[format('Microsoft.Storage/storageAccounts/{0}', parameters('storageAccountName'))]",
+      "name": "current",
       "properties": {
-        "source": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
-        "topicType": "Microsoft.Storage.StorageAccounts"
+        "isEnabled": true
       },
       "dependsOn": [
         "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
       ]
     },
     "_metadata": {
-      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-advanced-threat-protection-create/main.bicep",
       "is_mutated": false
     }
   },
   {
-    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Authorization/roleAssignments/[guid(resourceId('Microsoft.EventGrid/systemTopics', parameters('eventGridTopicName')), resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubNamespaceName'), parameters('eventHubName')), 'rbac')]",
-    "type": "Microsoft.Authorization/roleAssignments",
-    "apiVersion": "2022-04-01",
-    "name": "[guid(resourceId('Microsoft.EventGrid/systemTopics', parameters('eventGridTopicName')), resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubNamespaceName'), parameters('eventHubName')), 'rbac')]",
-    "location": null,
-    "properties": {
-      "description": "Azure Event Hubs Data Sender",
-      "principalId": "[reference(resourceId('Microsoft.EventGrid/systemTopics', parameters('eventGridTopicName')), '2023-12-15-preview', 'full').identity.principalId]",
-      "principalType": "ServicePrincipal",
-      "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '2b629674-e913-4c01-ae53-ef4638d8f975')]"
-    },
-    "dependsOn": [
-      "[resourceId('Microsoft.EventGrid/systemTopics', parameters('eventGridTopicName'))]",
-      "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubNamespaceName'), parameters('eventHubName'))]"
-    ],
-    "tags": {},
-    "sku": null,
-    "kind": null,
-    "_raw": {
-      "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2022-04-01",
-      "scope": "[format('Microsoft.EventHub/namespaces/{0}/eventhubs/{1}', parameters('eventHubNamespaceName'), parameters('eventHubName'))]",
-      "name": "[guid(resourceId('Microsoft.EventGrid/systemTopics', parameters('eventGridTopicName')), resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubNamespaceName'), parameters('eventHubName')), 'rbac')]",
-      "properties": {
-        "description": "Azure Event Hubs Data Sender",
-        "principalId": "[reference(resourceId('Microsoft.EventGrid/systemTopics', parameters('eventGridTopicName')), '2023-12-15-preview', 'full').identity.principalId]",
-        "principalType": "ServicePrincipal",
-        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '2b629674-e913-4c01-ae53-ef4638d8f975')]"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.EventGrid/systemTopics', parameters('eventGridTopicName'))]",
-        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubNamespaceName'), parameters('eventHubName'))]"
-      ]
-    },
-    "_metadata": {
-      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
-      "is_mutated": false
-    }
-  },
-  {
-    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Kusto/clusters/[parameters('clusterName')]",
-    "type": "Microsoft.Kusto/clusters",
-    "apiVersion": "2023-08-15",
-    "name": "[parameters('clusterName')]",
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]",
+    "type": "Microsoft.Storage/storageAccounts",
+    "apiVersion": "2021-04-01",
+    "name": "[parameters('storageAccountName')]",
     "location": "[parameters('location')]",
     "properties": {
-      "enableStreamingIngest": true
+      "accessTier": "Hot"
     },
     "dependsOn": [],
     "tags": {},
     "sku": {
-      "name": "[parameters('skuName')]",
-      "tier": "Standard",
-      "capacity": "[parameters('skuCapacity')]"
+      "name": "Standard_LRS"
     },
-    "kind": null,
+    "kind": "StorageV2",
     "_raw": {
-      "type": "Microsoft.Kusto/clusters",
-      "apiVersion": "2023-08-15",
-      "name": "[parameters('clusterName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2021-04-01",
+      "name": "[parameters('storageAccountName')]",
       "location": "[parameters('location')]",
+      "kind": "StorageV2",
       "sku": {
-        "name": "[parameters('skuName')]",
-        "tier": "Standard",
-        "capacity": "[parameters('skuCapacity')]"
-      },
-      "identity": {
-        "type": "SystemAssigned"
+        "name": "Standard_LRS"
       },
       "properties": {
-        "enableStreamingIngest": true
+        "accessTier": "Hot"
       }
     },
     "_metadata": {
-      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-multi-file-share/main.bicep",
       "is_mutated": false
     }
   },
   {
-    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Authorization/roleAssignments/[guid(parameters('clusterName'), parameters('eventHubName'), 'Azure Event Hubs Data Receiver')]",
-    "type": "Microsoft.Authorization/roleAssignments",
-    "apiVersion": "2022-04-01",
-    "name": "[guid(parameters('clusterName'), parameters('eventHubName'), 'Azure Event Hubs Data Receiver')]",
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/fileServices/shares/[format('{0}/default/{1}{2}', parameters('storageAccountName'), parameters('sharePrefix'), range(0, parameters('shareCopy'))[copyIndex()])]",
+    "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+    "apiVersion": "2021-04-01",
+    "name": "[format('{0}/default/{1}{2}', parameters('storageAccountName'), parameters('sharePrefix'), range(0, parameters('shareCopy'))[copyIndex()])]",
     "location": null,
-    "properties": {
-      "description": "Give \"Azure Event Hubs Data Receiver\" to the cluster",
-      "principalId": "[reference(resourceId('Microsoft.Kusto/clusters', parameters('clusterName')), '2023-08-15', 'full').identity.principalId]",
-      "principalType": "ServicePrincipal",
-      "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'a638d3c7-ab3a-418d-83e6-5f17a39d4fde')]"
-    },
+    "properties": {},
     "dependsOn": [
-      "[resourceId('Microsoft.Kusto/clusters', parameters('clusterName'))]",
-      "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubNamespaceName'), parameters('eventHubName'))]"
+      "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
     ],
     "tags": {},
     "sku": null,
     "kind": null,
     "_raw": {
-      "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2022-04-01",
-      "scope": "[format('Microsoft.EventHub/namespaces/{0}/eventhubs/{1}', parameters('eventHubNamespaceName'), parameters('eventHubName'))]",
-      "name": "[guid(parameters('clusterName'), parameters('eventHubName'), 'Azure Event Hubs Data Receiver')]",
-      "properties": {
-        "description": "Give \"Azure Event Hubs Data Receiver\" to the cluster",
-        "principalId": "[reference(resourceId('Microsoft.Kusto/clusters', parameters('clusterName')), '2023-08-15', 'full').identity.principalId]",
-        "principalType": "ServicePrincipal",
-        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'a638d3c7-ab3a-418d-83e6-5f17a39d4fde')]"
+      "copy": {
+        "name": "fileShares",
+        "count": "[length(range(0, parameters('shareCopy')))]"
       },
+      "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+      "apiVersion": "2021-04-01",
+      "name": "[format('{0}/default/{1}{2}', parameters('storageAccountName'), parameters('sharePrefix'), range(0, parameters('shareCopy'))[copyIndex()])]",
       "dependsOn": [
-        "[resourceId('Microsoft.Kusto/clusters', parameters('clusterName'))]",
-        "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('eventHubNamespaceName'), parameters('eventHubName'))]"
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
       ]
     },
     "_metadata": {
-      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-multi-file-share/main.bicep",
       "is_mutated": false
     }
   },
   {
-    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Authorization/roleAssignments/[guid(parameters('clusterName'), parameters('storageContainerName'), 'Storage Blob Data Contributor')]",
-    "type": "Microsoft.Authorization/roleAssignments",
-    "apiVersion": "2022-04-01",
-    "name": "[guid(parameters('clusterName'), parameters('storageContainerName'), 'Storage Blob Data Contributor')]",
-    "location": null,
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]",
+    "type": "Microsoft.Storage/storageAccounts",
+    "apiVersion": "2021-04-01",
+    "name": "[parameters('storageAccountName')]",
+    "location": "[parameters('location')]",
     "properties": {
-      "description": "Give \"Storage Blob Data Contributor\" to the cluster",
-      "principalId": "[reference(resourceId('Microsoft.Kusto/clusters', parameters('clusterName')), '2023-08-15', 'full').identity.principalId]",
-      "principalType": "ServicePrincipal",
-      "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')]"
+      "accessTier": "Hot"
     },
+    "dependsOn": [],
+    "tags": {},
+    "sku": {
+      "name": "Standard_LRS"
+    },
+    "kind": "StorageV2",
+    "_raw": {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2021-04-01",
+      "name": "[parameters('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "kind": "StorageV2",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "properties": {
+        "accessTier": "Hot"
+      }
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-file-share/main.bicep",
+      "is_mutated": false
+    }
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/fileServices/shares/[format('{0}/default/{1}', parameters('storageAccountName'), parameters('fileShareName'))]",
+    "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+    "apiVersion": "2021-04-01",
+    "name": "[format('{0}/default/{1}', parameters('storageAccountName'), parameters('fileShareName'))]",
+    "location": null,
+    "properties": {},
     "dependsOn": [
-      "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
-      "[resourceId('Microsoft.Kusto/clusters', parameters('clusterName'))]"
+      "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
     ],
     "tags": {},
     "sku": null,
     "kind": null,
     "_raw": {
-      "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2022-04-01",
-      "scope": "[format('Microsoft.Storage/storageAccounts/{0}/blobServices/{1}', parameters('storageAccountName'), 'default')]",
-      "name": "[guid(parameters('clusterName'), parameters('storageContainerName'), 'Storage Blob Data Contributor')]",
-      "properties": {
-        "description": "Give \"Storage Blob Data Contributor\" to the cluster",
-        "principalId": "[reference(resourceId('Microsoft.Kusto/clusters', parameters('clusterName')), '2023-08-15', 'full').identity.principalId]",
-        "principalType": "ServicePrincipal",
-        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')]"
-      },
+      "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+      "apiVersion": "2021-04-01",
+      "name": "[format('{0}/default/{1}', parameters('storageAccountName'), parameters('fileShareName'))]",
       "dependsOn": [
-        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccountName'), 'default')]",
-        "[resourceId('Microsoft.Kusto/clusters', parameters('clusterName'))]"
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
       ]
     },
     "_metadata": {
-      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.kusto/kusto-event-grid/azuredeploy.json",
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-file-share/main.bicep",
+      "is_mutated": false
+    }
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.KeyVault/vaults/[parameters('keyVaultName')]",
+    "type": "Microsoft.KeyVault/vaults",
+    "apiVersion": "2021-10-01",
+    "name": "[parameters('keyVaultName')]",
+    "location": "[parameters('location')]",
+    "properties": {
+      "sku": {
+        "name": "standard",
+        "family": "A"
+      },
+      "enableSoftDelete": true,
+      "enablePurgeProtection": true,
+      "enabledForDiskEncryption": true,
+      "tenantId": "[parameters('tenantId')]",
+      "accessPolicies": [
+        {
+          "tenantId": "[parameters('tenantId')]",
+          "permissions": {
+            "keys": [
+              "unwrapKey",
+              "wrapKey",
+              "get"
+            ]
+          },
+          "objectId": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('userAssignedIdentityResourceGroupName')), 'Microsoft.ManagedIdentity/userAssignedIdentities', parameters('userAssignedIdentityName')), '2018-11-30').principalId]"
+        }
+      ]
+    },
+    "dependsOn": [],
+    "tags": {},
+    "sku": null,
+    "kind": null,
+    "_raw": {
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2021-10-01",
+      "name": "[parameters('keyVaultName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "sku": {
+          "name": "standard",
+          "family": "A"
+        },
+        "enableSoftDelete": true,
+        "enablePurgeProtection": true,
+        "enabledForDiskEncryption": true,
+        "tenantId": "[parameters('tenantId')]",
+        "accessPolicies": [
+          {
+            "tenantId": "[parameters('tenantId')]",
+            "permissions": {
+              "keys": [
+                "unwrapKey",
+                "wrapKey",
+                "get"
+              ]
+            },
+            "objectId": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('userAssignedIdentityResourceGroupName')), 'Microsoft.ManagedIdentity/userAssignedIdentities', parameters('userAssignedIdentityName')), '2018-11-30').principalId]"
+          }
+        ]
+      }
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-blob-encryption-with-cmk/main.bicep",
+      "is_mutated": false
+    }
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.KeyVault/vaults/keys/[format('{0}/{1}', parameters('keyVaultName'), parameters('keyVaultKeyName'))]",
+    "type": "Microsoft.KeyVault/vaults/keys",
+    "apiVersion": "2021-10-01",
+    "name": "[format('{0}/{1}', parameters('keyVaultName'), parameters('keyVaultKeyName'))]",
+    "location": null,
+    "properties": {
+      "attributes": {
+        "enabled": true,
+        "exp": "[parameters('keyExpiration')]"
+      },
+      "keySize": 4096,
+      "kty": "RSA"
+    },
+    "dependsOn": [
+      "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+    ],
+    "tags": {},
+    "sku": null,
+    "kind": null,
+    "_raw": {
+      "type": "Microsoft.KeyVault/vaults/keys",
+      "apiVersion": "2021-10-01",
+      "name": "[format('{0}/{1}', parameters('keyVaultName'), parameters('keyVaultKeyName'))]",
+      "properties": {
+        "attributes": {
+          "enabled": true,
+          "exp": "[parameters('keyExpiration')]"
+        },
+        "keySize": 4096,
+        "kty": "RSA"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+      ]
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-blob-encryption-with-cmk/main.bicep",
+      "is_mutated": false
+    }
+  },
+  {
+    "id": "/subscriptions/template-sim/resourceGroups/template-rg/providers/Microsoft.Storage/storageAccounts/[parameters('storageAccountName')]",
+    "type": "Microsoft.Storage/storageAccounts",
+    "apiVersion": "2021-04-01",
+    "name": "[parameters('storageAccountName')]",
+    "location": "[parameters('location')]",
+    "properties": {
+      "accessTier": "Hot",
+      "supportsHttpsTrafficOnly": true,
+      "minimumTlsVersion": "TLS1_2",
+      "encryption": {
+        "identity": {
+          "userAssignedIdentity": "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('userAssignedIdentityResourceGroupName')), 'Microsoft.ManagedIdentity/userAssignedIdentities', parameters('userAssignedIdentityName'))]"
+        },
+        "services": {
+          "blob": {
+            "enabled": true
+          }
+        },
+        "keySource": "Microsoft.Keyvault",
+        "keyvaultproperties": {
+          "keyname": "[parameters('keyVaultKeyName')]",
+          "keyvaulturi": "[if(endsWith(reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2021-10-01').vaultUri, '/'), substring(reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2021-10-01').vaultUri, 0, sub(length(reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2021-10-01').vaultUri), 1)), reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2021-10-01').vaultUri)]"
+        }
+      }
+    },
+    "dependsOn": [
+      "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+      "[resourceId('Microsoft.KeyVault/vaults/keys', parameters('keyVaultName'), parameters('keyVaultKeyName'))]"
+    ],
+    "tags": {},
+    "sku": {
+      "name": "Standard_LRS"
+    },
+    "kind": "StorageV2",
+    "_raw": {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2021-04-01",
+      "name": "[parameters('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "identity": {
+        "type": "UserAssigned",
+        "userAssignedIdentities": {
+          "[format('{0}', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('userAssignedIdentityResourceGroupName')), 'Microsoft.ManagedIdentity/userAssignedIdentities', parameters('userAssignedIdentityName')))]": {}
+        }
+      },
+      "properties": {
+        "accessTier": "Hot",
+        "supportsHttpsTrafficOnly": true,
+        "minimumTlsVersion": "TLS1_2",
+        "encryption": {
+          "identity": {
+            "userAssignedIdentity": "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('userAssignedIdentityResourceGroupName')), 'Microsoft.ManagedIdentity/userAssignedIdentities', parameters('userAssignedIdentityName'))]"
+          },
+          "services": {
+            "blob": {
+              "enabled": true
+            }
+          },
+          "keySource": "Microsoft.Keyvault",
+          "keyvaultproperties": {
+            "keyname": "[parameters('keyVaultKeyName')]",
+            "keyvaulturi": "[if(endsWith(reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2021-10-01').vaultUri, '/'), substring(reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2021-10-01').vaultUri, 0, sub(length(reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2021-10-01').vaultUri), 1)), reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2021-10-01').vaultUri)]"
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults/keys', parameters('keyVaultName'), parameters('keyVaultKeyName'))]"
+      ]
+    },
+    "_metadata": {
+      "source_template": "templates/azure-quickstart-templates/quickstarts/microsoft.storage/storage-blob-encryption-with-cmk/main.bicep",
       "is_mutated": false
     }
   }

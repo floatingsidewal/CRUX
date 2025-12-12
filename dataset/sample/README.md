@@ -1,13 +1,13 @@
 # Sample Dataset
 
-This is a small sample dataset for CRUX (Cloud Resource Configuration Analyzer).
+This is a small sample dataset for CRUX (Cloud Resource mUtation eXtractor).
 
 ## Dataset Statistics
 
-- **Templates processed**: 5 Azure Quickstart Templates
-- **Baseline resources**: 20 (unmutated)
-- **Mutated resources**: 10 (with security misconfigurations)
-- **Labels generated**: 47 misconfiguration labels
+- **Templates processed**: 10 Azure Quickstart Templates (Storage-focused)
+- **Baseline resources**: 24 (unmutated)
+- **Mutated resources**: 110 (with security misconfigurations)
+- **Labels generated**: 451 misconfiguration labels
 
 ## Dataset Structure
 
@@ -84,6 +84,6 @@ crux generate-dataset \
   --rules rules/ \
   --output dataset/ \
   --name benchmark \
-  --limit 100 \
-  --pattern "quickstarts/**/azuredeploy.json"
+  --limit 500 \
+  --pattern "**/*.bicep"
 ```
