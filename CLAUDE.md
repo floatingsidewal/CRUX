@@ -438,11 +438,35 @@ crux evaluate-model \
 #### Export to CSV
 
 ```bash
-# Export dataset to CSV with features and binary labels
+# Option A: Hashed features (default, 100 numeric columns)
 crux export-csv \
   --dataset dataset/exp-20240101-120000 \
   --output data/crux_data.csv \
   --max-features 100 \
+  --binary-mode any
+
+# Option B: Named properties for interpretable ML (recommended for research)
+crux export-csv \
+  --dataset dataset/exp-20240101-120000 \
+  --output data/crux_capstone.csv \
+  --include-baseline \
+  --named-properties curated \
+  --binary-mode any
+
+# Option C: All properties (sparse, 500+ columns)
+crux export-csv \
+  --dataset dataset/exp-20240101-120000 \
+  --output data/crux_all_props.csv \
+  --include-baseline \
+  --named-properties all \
+  --binary-mode any
+
+# Option D: Custom property list
+crux export-csv \
+  --dataset dataset/exp-20240101-120000 \
+  --output data/crux_custom.csv \
+  --include-baseline \
+  --property-list my_properties.txt \
   --binary-mode any
 
 # Export metadata only (no features)
@@ -450,14 +474,20 @@ crux export-csv \
   --dataset dataset/exp-20240101-120000 \
   --output data/crux_metadata.csv \
   --no-features
-
-# Include baseline resources for balanced dataset
-crux export-csv \
-  --dataset dataset/exp-20240101-120000 \
-  --output data/crux_full.csv \
-  --include-baseline \
-  --binary-mode any
 ```
+
+**Named Properties Options:**
+- `--named-properties none`: Use hashed features (default)
+- `--named-properties curated`: 24 security-relevant properties with interpretable names
+- `--named-properties all`: Extract all available properties (sparse matrix)
+- `--property-list FILE`: Custom list of property paths (one per line)
+
+**Curated Properties Include:**
+- Storage: `allowBlobPublicAccess`, `supportsHttpsTrafficOnly`, `minimumTlsVersion`
+- Key Vault: `enablePurgeProtection`, `enableSoftDelete`, `enableRbacAuthorization`
+- Network: `enableDdosProtection`, `securityRules`
+- VM: `osProfile_linuxConfiguration_disablePasswordAuthentication`
+- General: `location`, `sku_name`, `sku_tier`, `kind`
 
 Use the exported CSV in Python, R, Excel, or any other data analysis tool. See `docs/csv-export-example.md` for complete examples.
 
@@ -494,10 +524,19 @@ crux train-model \
   --name lr-binary
 
 # 4. Export to CSV for external analysis
+# Option A: Hashed features
 crux export-csv \
   --dataset dataset/exp-001 \
   --output data/exp-001.csv \
   --max-features 100 \
+  --binary-mode any
+
+# Option B: Named properties (for research/capstone)
+crux export-csv \
+  --dataset dataset/exp-001 \
+  --output data/exp-001-capstone.csv \
+  --include-baseline \
+  --named-properties curated \
   --binary-mode any
 
 # 5. Evaluate models

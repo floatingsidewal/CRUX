@@ -295,10 +295,19 @@ crux train-gnn \
   --name gat-attention
 
 # 5. Export to CSV for external analysis
+# Option A: Hashed features (100 numeric columns)
 crux export-csv \
   --dataset dataset/ml-experiment-001 \
   --output data/ml-experiment-001.csv \
   --max-features 100 \
+  --binary-mode any
+
+# Option B: Named properties for interpretable ML (recommended for research)
+crux export-csv \
+  --dataset dataset/ml-experiment-001 \
+  --output data/ml-capstone.csv \
+  --include-baseline \
+  --named-properties curated \
   --binary-mode any
 
 # 6. Evaluate models
@@ -335,6 +344,39 @@ crux evaluate-model \
 - Save `metadata.json` with each experiment
 - Use descriptive names (e.g., `core-infra-2024-01-15` instead of `test-001`)
 - Document the `--pattern` and `--limit` used in your experiment notes
+
+### CSV Export Options
+
+The `crux export-csv` command supports multiple export modes for different use cases:
+
+**Feature Types:**
+- `--max-features N`: Hashed numeric features (default: 100 columns named `feature_0`, `feature_1`, etc.)
+- `--named-properties curated`: 24 interpretable security-relevant properties (e.g., `allowBlobPublicAccess`, `enablePurgeProtection`)
+- `--named-properties all`: All extracted properties as columns (can be 500+ columns)
+- `--property-list FILE`: Custom list of property paths to extract
+
+**Class Balance:**
+- By default, only mutated (positive) samples are exported
+- `--include-baseline`: Adds baseline resources as negative class (`has_misconfiguration=0`)
+- Recommended for logistic regression and balanced ML training
+
+**Example for Research/Capstone Projects:**
+```bash
+crux export-csv \
+  --dataset dataset/maximum-001 \
+  --output capstone_data.csv \
+  --include-baseline \
+  --named-properties curated \
+  --binary-mode any
+```
+
+This produces a CSV with:
+- ~20,000 rows (positive + negative samples)
+- 33 columns (9 metadata + 24 named properties)
+- ~63% positive / ~37% negative class balance
+- Interpretable column names for logistic regression coefficients
+
+See `docs/csv-export-example.md` for detailed Python and R examples.
 
 ## Repository Layout
 
