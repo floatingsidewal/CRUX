@@ -213,6 +213,12 @@ __marimo__/
 # CRUX datasets and build outputs (root level only)
 /dataset/*
 !/dataset/sample/
+!/dataset/maximum-001/
+/dataset/maximum-001/baseline/
+/dataset/maximum-001/mutated/
+/dataset/maximum-001/graphs/
+/dataset/maximum-001/labels.json
+/dataset/maximum-001/metadata.json
 /templates/
 /models/
 out/

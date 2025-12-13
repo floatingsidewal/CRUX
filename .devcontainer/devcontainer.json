@@ -1,5 +1,5 @@
 {
-  "name": "CRUX Development (Option D - Static Analysis)",
+  "name": "CRUX Development",
   "build": {
     "dockerfile": "Dockerfile"
   },

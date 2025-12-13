@@ -71,7 +71,7 @@ pip install -e .[ml]
 
 # 3. Verify Azure CLI and Bicep are installed
 az --version
-bicep --version
+az bicep version  # Install with: az bicep install
 ```
 
 ### Basic Workflow
