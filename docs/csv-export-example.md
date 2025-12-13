@@ -34,10 +34,19 @@ crux generate-dataset \
 Export the dataset to CSV format with binary labels and features:
 
 ```bash
+# Option A: Hashed features (default, 100 numeric columns)
 crux export-csv \
   --dataset dataset/my-experiment \
   --output data/crux_data.csv \
   --max-features 100 \
+  --binary-mode any
+
+# Option B: Named properties for interpretable ML (recommended for capstone/research)
+crux export-csv \
+  --dataset dataset/my-experiment \
+  --output data/crux_capstone.csv \
+  --include-baseline \
+  --named-properties curated \
   --binary-mode any
 ```
 
@@ -290,7 +299,55 @@ crux export-csv \
   --binary-mode any
 ```
 
-This provides more balanced data with clean examples.
+This provides more balanced data with clean examples (negative class).
+
+### Named Property Extraction for Research
+
+For logistic regression and statistical analysis where you need interpretable coefficient names:
+
+```bash
+# Use curated security-relevant properties (~24 columns)
+crux export-csv \
+  --dataset dataset/my-experiment \
+  --output data/capstone_data.csv \
+  --include-baseline \
+  --named-properties curated \
+  --binary-mode any
+
+# Extract ALL properties (sparse, 500+ columns)
+crux export-csv \
+  --dataset dataset/my-experiment \
+  --output data/all_properties.csv \
+  --include-baseline \
+  --named-properties all \
+  --binary-mode any
+
+# Use a custom property list file
+crux export-csv \
+  --dataset dataset/my-experiment \
+  --output data/custom_properties.csv \
+  --include-baseline \
+  --property-list my_properties.txt \
+  --binary-mode any
+```
+
+**Curated properties include:**
+- Storage: `allowBlobPublicAccess`, `supportsHttpsTrafficOnly`, `minimumTlsVersion`
+- Key Vault: `enablePurgeProtection`, `enableSoftDelete`, `enableRbacAuthorization`
+- Network: `enableDdosProtection`, `securityRules`
+- VM: `osProfile_linuxConfiguration_disablePasswordAuthentication`
+- General: `location`, `sku_name`, `sku_tier`, `kind`
+
+**Custom property list file format** (one property path per line):
+```
+# my_properties.txt
+properties.allowBlobPublicAccess
+properties.supportsHttpsTrafficOnly
+properties.minimumTlsVersion
+properties.enablePurgeProtection
+location
+sku.name
+```
 
 ### Custom Feature Engineering in Python
 
@@ -406,6 +463,79 @@ smote = SMOTE(random_state=42)
 X_resampled, y_resampled = smote.fit_resample(X_train, y_train)
 ```
 
+## Research Use Cases
+
+### Capstone Project: Logistic Regression with Named Properties
+
+For academic research requiring interpretable coefficients:
+
+```bash
+# Export with curated properties and balanced classes
+crux export-csv \
+  --dataset dataset/maximum-001 \
+  --output capstone_data.csv \
+  --include-baseline \
+  --named-properties curated \
+  --binary-mode any
+```
+
+**Expected output:**
+- ~20,000 rows (12,580 positive + 7,415 negative)
+- ~63% positive / ~37% negative class balance
+- 33 columns (9 metadata + 24 named properties)
+
+**Logistic Regression in Python:**
+```python
+import pandas as pd
+import statsmodels.api as sm
+import numpy as np
+
+# Load data
+df = pd.read_csv('capstone_data.csv')
+
+# Select IVs (independent variables)
+ivs = ['allowBlobPublicAccess', 'supportsHttpsTrafficOnly',
+       'minimumTlsVersion', 'enablePurgeProtection',
+       'enableSoftDelete', 'enableDdosProtection']
+
+# Clean missing values
+X = df[ivs].fillna(0)  # or use mean imputation
+y = df['has_misconfiguration']
+
+# Add constant for intercept
+X_const = sm.add_constant(X)
+
+# Fit logistic regression
+model = sm.Logit(y, X_const)
+result = model.fit()
+
+# Print statistical summary with coefficients and p-values
+print(result.summary())
+
+# Calculate odds ratios
+odds_ratios = np.exp(result.params)
+print("\nOdds Ratios:")
+print(odds_ratios)
+```
+
+**ANOVA by Resource Type in R:**
+```r
+library(tidyverse)
+
+df <- read.csv("capstone_data.csv")
+
+# One-way ANOVA: misconfiguration rate by resource type
+anova_result <- aov(has_misconfiguration ~ resource_type, data = df)
+summary(anova_result)
+
+# Post-hoc Tukey test
+TukeyHSD(anova_result)
+
+# Effect size (eta-squared)
+library(effectsize)
+eta_squared(anova_result)
+```
+
 ## Next Steps
 
 - **Model Comparison**: Compare CRUX built-in models vs custom models
@@ -417,5 +547,5 @@ X_resampled, y_resampled = smote.fit_resample(X_train, y_train)
 ## Support
 
 For questions or issues:
-- GitHub: https://github.com/anthropics/crux/issues
+- GitHub: https://github.com/floatingsidewal/CRUX/issues
 - Documentation: See `CLAUDE.md` in the repository root

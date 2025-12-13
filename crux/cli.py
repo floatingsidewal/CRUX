@@ -357,6 +357,23 @@ def cmd_export_csv(args: argparse.Namespace) -> None:
 
     logger.info(f"Exporting dataset {args.dataset} to CSV...")
 
+    # Load property list from file if provided
+    property_list = None
+    if args.property_list:
+        property_list_path = Path(args.property_list)
+        if property_list_path.exists():
+            with open(property_list_path) as f:
+                # Read properties, one per line, skip comments and empty lines
+                property_list = [
+                    line.strip()
+                    for line in f
+                    if line.strip() and not line.strip().startswith("#")
+                ]
+            logger.info(f"Loaded {len(property_list)} properties from {args.property_list}")
+        else:
+            logger.error(f"Property list file not found: {args.property_list}")
+            sys.exit(1)
+
     # Load dataset
     loader = DatasetLoader(args.dataset)
 
@@ -367,6 +384,8 @@ def cmd_export_csv(args: argparse.Namespace) -> None:
         max_features=args.max_features,
         binary_mode=args.binary_mode,
         include_baseline=args.include_baseline,
+        named_properties=args.named_properties,
+        property_list=property_list,
     )
 
     logger.info(f"\nCSV export complete: {args.output}")
@@ -738,7 +757,18 @@ def build_parser() -> argparse.ArgumentParser:
     export_csv_parser.add_argument(
         "--include-baseline",
         action="store_true",
-        help="Include baseline (unmutated) resources in export",
+        help="Include baseline (unmutated) resources as negative class (has_misconfiguration=0)",
+    )
+    export_csv_parser.add_argument(
+        "--named-properties",
+        choices=["none", "curated", "all"],
+        default="none",
+        help="Named property extraction mode: 'none' = hashed features (default), "
+             "'curated' = ~25 security-relevant properties, 'all' = all properties (sparse)",
+    )
+    export_csv_parser.add_argument(
+        "--property-list",
+        help="Path to custom property list file (one property path per line, overrides --named-properties)",
     )
     export_csv_parser.set_defaults(func=cmd_export_csv)
 

@@ -338,6 +338,8 @@ class DatasetLoader:
         max_features: int = 100,
         binary_mode: str = "any",
         include_baseline: bool = False,
+        named_properties: str = "none",
+        property_list: Optional[List[str]] = None,
     ) -> None:
         """
         Export dataset to CSV format for use in external tools.
@@ -348,29 +350,36 @@ class DatasetLoader:
             max_features: Maximum number of features to extract
             binary_mode: How to create binary labels ('any', etc.)
             include_baseline: Whether to include baseline (unmutated) resources
+            named_properties: Named property extraction mode:
+                - 'none': Use hashed features (default)
+                - 'all': Extract all ARM properties as columns (sparse)
+                - 'curated': Use predefined security-relevant properties
+            property_list: Custom list of property paths to extract (overrides named_properties)
         """
         import pandas as pd
-        from .features import FeatureExtractor
+        from .features import FeatureExtractor, NamedPropertyExtractor
 
-        # Load data
-        resources = self.load_resources(
-            include_baseline=include_baseline,
+        # Load mutated resources and labels
+        mutated_resources = self.load_resources(
+            include_baseline=False,
             include_mutated=True,
         )
         labels_dict = self.load_labels()
 
-        # Prepare training data
-        labeled_resources, label_matrix, label_names = self.prepare_training_data(
-            resources, labels_dict
+        # Prepare mutated training data
+        labeled_mutated, label_matrix, label_names = self.prepare_training_data(
+            mutated_resources, labels_dict
         )
 
-        # Get binary labels
+        # Get binary labels for mutated resources
         binary_labels = self.get_binary_labels(label_matrix, mode=binary_mode)
 
-        # Build base dataframe
+        # Build rows for mutated resources
         rows = []
+        all_resources = []  # For feature extraction later
+
         for resource, binary_label, multi_labels in zip(
-            labeled_resources,
+            labeled_mutated,
             binary_labels,
             label_matrix,
         ):
@@ -383,10 +392,10 @@ class DatasetLoader:
             row = {
                 "resource_id": resource_id,
                 "resource_type": resource.get("type", "unknown"),
-                "is_mutated": int(resource.get("_metadata", {}).get("is_mutated", False)),
+                "is_mutated": 1,
                 "mutation_id": mutation_id,
                 "mutation_severity": resource.get("_metadata", {}).get("mutation_severity", ""),
-                "has_misconfiguration": binary_label,
+                "has_misconfiguration": int(binary_label),
                 "label_count": int(np.sum(multi_labels)),
                 "labels": ",".join([
                     label_names[i]
@@ -396,33 +405,77 @@ class DatasetLoader:
                 "source_template": resource.get("_metadata", {}).get("source_template", ""),
             }
             rows.append(row)
+            all_resources.append(resource)
+
+        # Add baseline resources as negative class
+        if include_baseline and self.baseline_file.exists():
+            with open(self.baseline_file) as f:
+                baseline_resources = json.load(f)
+
+            logger.info(f"Adding {len(baseline_resources)} baseline resources as negative class")
+
+            for resource in baseline_resources:
+                resource_id = resource.get("id", resource.get("name", "unknown"))
+
+                row = {
+                    "resource_id": resource_id,
+                    "resource_type": resource.get("type", "unknown"),
+                    "is_mutated": 0,
+                    "mutation_id": "",
+                    "mutation_severity": "",
+                    "has_misconfiguration": 0,  # Baseline = no misconfiguration
+                    "label_count": 0,
+                    "labels": "",
+                    "source_template": resource.get("_metadata", {}).get("source_template", ""),
+                }
+                rows.append(row)
+                all_resources.append(resource)
 
         df = pd.DataFrame(rows)
 
-        # Add feature columns if requested
+        # Add feature columns based on extraction mode
         if include_features:
-            logger.info(f"Extracting features (max_features={max_features})...")
-            extractor = FeatureExtractor(max_features=max_features)
-            feature_matrix, _ = extractor.fit_transform(labeled_resources)
+            if named_properties == "none" and property_list is None:
+                # Use hashed features (original behavior)
+                logger.info(f"Extracting hashed features (max_features={max_features})...")
+                extractor = FeatureExtractor(max_features=max_features)
+                feature_matrix, _ = extractor.fit_transform(all_resources)
 
-            # Add feature columns
-            for i in range(feature_matrix.shape[1]):
-                # Use actual feature names if available
-                if i < len(extractor.feature_names):
-                    col_name = f"feature_{extractor.feature_names[i]}"
-                else:
-                    col_name = f"feature_{i}"
-                df[col_name] = feature_matrix[:, i]
+                # Add feature columns
+                for i in range(feature_matrix.shape[1]):
+                    if i < len(extractor.feature_names):
+                        col_name = f"feature_{extractor.feature_names[i]}"
+                    else:
+                        col_name = f"feature_{i}"
+                    df[col_name] = feature_matrix[:, i]
 
-            logger.info(f"Added {feature_matrix.shape[1]} feature columns")
+                logger.info(f"Added {feature_matrix.shape[1]} hashed feature columns")
+            else:
+                # Use named property extraction
+                logger.info(f"Extracting named properties (mode={named_properties})...")
+                named_extractor = NamedPropertyExtractor(
+                    mode=named_properties,
+                    property_list=property_list,
+                )
+                property_df = named_extractor.extract(all_resources)
+
+                # Merge property columns into main dataframe
+                for col in property_df.columns:
+                    df[col] = property_df[col].values
+
+                logger.info(f"Added {len(property_df.columns)} named property columns")
 
         # Write to CSV
         output_file = Path(output_path)
         output_file.parent.mkdir(parents=True, exist_ok=True)
         df.to_csv(output_file, index=False)
 
+        # Calculate class distribution
+        positive_count = df['has_misconfiguration'].sum()
+        negative_count = len(df) - positive_count
+
         logger.info(f"Exported {len(df)} rows to {output_path}")
         logger.info(f"Columns: {list(df.columns)[:10]}... ({len(df.columns)} total)")
-        logger.info(f"Binary label distribution: "
-                   f"positive={np.sum(binary_labels)}, "
-                   f"negative={len(binary_labels) - np.sum(binary_labels)}")
+        logger.info(f"Class distribution: positive={positive_count}, negative={negative_count}")
+        if negative_count > 0:
+            logger.info(f"Class balance: {positive_count/len(df)*100:.1f}% positive, {negative_count/len(df)*100:.1f}% negative")
