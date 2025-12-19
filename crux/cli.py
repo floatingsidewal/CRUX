@@ -7,10 +7,15 @@ Command-line interface for the CRUX static template analysis system.
 import argparse
 import logging
 import sys
+from datetime import datetime
 from pathlib import Path
 
 from .templates.fetcher import TemplateFetcher
 from .dataset.generator import DatasetGenerator
+from .dataset.template_level_generator import (
+    TemplateLevelDatasetGenerator,
+    MUTATION_SCENARIOS,
+)
 from .mutations import ALL_MUTATIONS
 
 # Configure logging
@@ -395,6 +400,128 @@ def cmd_export_csv(args: argparse.Namespace) -> None:
     logger.info(f"  3. Load in R: df <- read.csv('{args.output}')")
 
 
+def discover_templates(templates_dir: str) -> list:
+    """
+    Discover all Bicep/ARM templates in directory.
+
+    Args:
+        templates_dir: Directory containing templates
+
+    Returns:
+        List of template file paths (Paths)
+    """
+    templates_path = Path(templates_dir)
+    bicep_files = list(templates_path.rglob("*.bicep"))
+    arm_files = list(templates_path.rglob("azuredeploy.json"))
+
+    # Prefer Bicep if both exist in same directory
+    template_dirs = set()
+    for f in bicep_files + arm_files:
+        template_dirs.add(f.parent)
+
+    templates = []
+    for d in template_dirs:
+        bicep = list(d.glob("main.bicep")) or list(d.glob("*.bicep"))
+        if bicep:
+            templates.append(bicep[0])
+        else:
+            arm = list(d.glob("azuredeploy.json"))
+            if arm:
+                templates.append(arm[0])
+
+    return templates
+
+
+def cmd_generate_template_dataset(args: argparse.Namespace) -> None:
+    """Generate template-level dataset for logistic regression analysis."""
+    from datetime import datetime
+
+    logger.info("Generating template-level dataset...")
+
+    # Discover templates
+    template_dir = Path(args.templates)
+    if not template_dir.exists():
+        logger.error(f"Template directory not found: {template_dir}")
+        sys.exit(1)
+
+    template_paths = discover_templates(str(template_dir))
+    logger.info(f"Found {len(template_paths)} templates")
+
+    if not template_paths:
+        logger.error("No templates found in directory")
+        sys.exit(1)
+
+    # Parse scenario selection
+    if args.scenarios == "all":
+        scenario_subset = None
+        logger.info(f"Using all {len(MUTATION_SCENARIOS)} scenarios")
+    elif args.scenarios == "minimal":
+        scenario_subset = [
+            "baseline",
+            "security_all",
+            "operational_all",
+            "reliability_all",
+            "all_mutations",
+        ]
+        logger.info(f"Using minimal scenario set ({len(scenario_subset)} scenarios)")
+    else:
+        scenario_subset = [s.strip() for s in args.scenarios.split(",")]
+        logger.info(f"Using custom scenario set ({len(scenario_subset)} scenarios)")
+
+    # Initialize generator
+    generator = TemplateLevelDatasetGenerator(rules_dir=args.rules)
+
+    # Generate dataset
+    output_path = generator.generate_dataset(
+        template_paths=[str(p) for p in template_paths],
+        output_dir=args.output,
+        experiment_name=args.name,
+        limit=args.limit,
+        scenarios_subset=scenario_subset,
+    )
+
+    logger.info(f"\nTemplate-level dataset generated: {output_path}")
+
+    # Load and display summary stats
+    import json
+
+    stats_file = Path(output_path) / "summary_stats.json"
+    if stats_file.exists():
+        with open(stats_file) as f:
+            stats = json.load(f)
+
+        logger.info("\nDataset Summary:")
+        logger.info(f"  Total observations: {stats['total_observations']}")
+        logger.info(f"  Unique templates: {stats['unique_templates']}")
+        logger.info(f"  Unique scenarios: {stats['unique_scenarios']}")
+        logger.info(
+            f"  DV positive rate: {stats['dv_positive_rate']:.1%} have misconfigurations"
+        )
+
+    logger.info("\nNext steps:")
+    logger.info(f"  1. View CSV: head {output_path}/template_level_data.csv")
+    logger.info(f"  2. View metadata: cat {output_path}/metadata.json")
+    logger.info(f"  3. View summary: cat {output_path}/summary_stats.json")
+
+    # Run validation if requested
+    if args.validate:
+        logger.info("\nRunning validation...")
+        from .dataset.validator import validate_template_dataset
+
+        csv_path = Path(output_path) / "template_level_data.csv"
+        try:
+            validation_results = validate_template_dataset(str(csv_path))
+
+            if validation_results["meets_requirements"]:
+                logger.info("✓ Dataset meets all requirements")
+            else:
+                logger.warning("⚠ Dataset has validation issues - see report above")
+        except ImportError:
+            logger.warning("Validation module not yet implemented - skipping")
+        except Exception as e:
+            logger.error(f"Validation error: {e}")
+
+
 def cmd_train_gnn(args: argparse.Namespace) -> None:
     """Train a Graph Neural Network model on dependency graphs."""
     from datetime import datetime
@@ -621,6 +748,51 @@ def build_parser() -> argparse.ArgumentParser:
         help="Also include azuredeploy.json files (ARM templates without Bicep source)",
     )
     generate_parser.set_defaults(func=cmd_generate_dataset)
+
+    # generate-template-dataset command
+    template_dataset_parser = subparsers.add_parser(
+        "generate-template-dataset",
+        help="Generate template-level dataset for logistic regression analysis",
+    )
+    template_dataset_parser.add_argument(
+        "--templates",
+        required=True,
+        help="Directory containing Bicep/ARM templates",
+    )
+    template_dataset_parser.add_argument(
+        "--rules",
+        default="rules",
+        help="Directory containing YAML rule files (default: rules)",
+    )
+    template_dataset_parser.add_argument(
+        "--output",
+        default="dataset",
+        help="Output directory for dataset (default: dataset)",
+    )
+    template_dataset_parser.add_argument(
+        "--name",
+        default=f"template-level-{datetime.now().strftime('%Y%m%d')}",
+        help="Experiment name (default: template-level-YYYYMMDD)",
+    )
+    template_dataset_parser.add_argument(
+        "--limit",
+        type=int,
+        help="Limit number of templates to process",
+    )
+    template_dataset_parser.add_argument(
+        "--scenarios",
+        default="all",
+        help=(
+            "Scenario set: 'all' (14 scenarios), 'minimal' (5 scenarios), "
+            "or comma-separated list (e.g., 'baseline,security_all,all_mutations')"
+        ),
+    )
+    template_dataset_parser.add_argument(
+        "--validate",
+        action="store_true",
+        help="Run validation after generation",
+    )
+    template_dataset_parser.set_defaults(func=cmd_generate_template_dataset)
 
     # list-mutations command
     list_mutations_parser = subparsers.add_parser(

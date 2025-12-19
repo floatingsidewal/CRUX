@@ -219,6 +219,7 @@ __marimo__/
 /dataset/maximum-001/graphs/
 /dataset/maximum-001/labels.json
 /dataset/maximum-001/metadata.json
+!/dataset/maximum-template-level/
 /templates/
 /models/
 out/

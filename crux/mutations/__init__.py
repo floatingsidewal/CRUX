@@ -25,6 +25,16 @@ ALL_MUTATIONS = (
     loadbalancer.ALL_MUTATIONS
 )
 
+def get_all_mutations():
+    """
+    Get all available mutations.
+
+    Returns:
+        List of Mutation objects from all modules
+    """
+    return ALL_MUTATIONS
+
+
 __all__ = [
     "storage",
     "vm",
@@ -35,4 +45,5 @@ __all__ = [
     "database",
     "loadbalancer",
     "ALL_MUTATIONS",
+    "get_all_mutations",
 ]
