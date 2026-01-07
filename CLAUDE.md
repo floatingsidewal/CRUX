@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-CRUX (Cloud Resource Configuration Analyzer) generates labeled datasets for training ML models to detect Azure resource misconfigurations. It uses **static template analysis** (Option D): analyzing Bicep/ARM templates locally without deploying to Azure, enabling zero-cost, large-scale dataset generation.
+CRUX (Cloud Resource Configuration Analyzer) generates labeled datasets for training ML models to detect Azure resource misconfigurations. It uses **static template analysis**: analyzing Bicep/ARM templates locally without deploying to Azure, enabling zero-cost, large-scale dataset generation.
 
 ## Documentation Organization
 
