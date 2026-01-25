@@ -1,0 +1,28 @@
+{
+  "test_case_id": "keyvault/no-purge-protection",
+  "version": "1.0",
+  "created": "2025-01-25",
+  "contributor": "crux-team",
+  "source": "synthetic",
+  "description": "Key Vault with soft delete but NO purge protection - secrets can be permanently deleted",
+  "expected_findings": [
+    {
+      "resource_type": "Microsoft.KeyVault/vaults",
+      "resource_name_pattern": "kv-nopurge-*",
+      "expected_labels": ["KeyVault_NoPurgeProtection"],
+      "min_risk_score": 0.6,
+      "expected_risk_level": "HIGH",
+      "must_detect": true
+    }
+  ],
+  "false_positive_checks": [
+    {
+      "description": "Should NOT flag soft delete (it's enabled)",
+      "unexpected_labels": ["KeyVault_NoSoftDelete"]
+    }
+  ],
+  "cis_references": ["8.4"],
+  "real_world_impact": "Without purge protection, a malicious insider or compromised account can permanently delete secrets, keys, and certificates. Even with soft delete enabled, the purge operation bypasses the retention period. This has caused permanent loss of encryption keys and service outages.",
+  "remediation": "Set enablePurgeProtection to true. Note: This cannot be disabled once enabled.",
+  "tags": ["secrets-management", "insider-threat", "data-loss"]
+}

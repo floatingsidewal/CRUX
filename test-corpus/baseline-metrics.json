@@ -1,0 +1,41 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2025-01-25",
+  "description": "Baseline metrics for corpus validation. Updated when model is retrained or corpus changes.",
+  "model": {
+    "name": "rf-baseline",
+    "path": "models/rf-baseline.pkl",
+    "version": "1.0.0",
+    "trained_on": "2025-01-25"
+  },
+  "thresholds": {
+    "min_pass_rate": 0.95,
+    "min_precision": 0.90,
+    "min_recall": 0.85,
+    "max_precision_drop": 0.05,
+    "max_recall_drop": 0.05
+  },
+  "baseline_metrics": {
+    "pass_rate": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "true_positives": 0,
+    "false_positives": 0,
+    "false_negatives": 0
+  },
+  "corpus_stats": {
+    "total_cases": 3,
+    "by_category": {
+      "storage": {
+        "cases": 2,
+        "pass_rate": 1.0
+      },
+      "keyvault": {
+        "cases": 1,
+        "pass_rate": 1.0
+      }
+    }
+  },
+  "notes": "Initial baseline with synthetic test cases. Metrics will be updated as real-world cases are added."
+}

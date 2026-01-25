@@ -1,0 +1,31 @@
+{
+  "test_case_id": "storage/public-blob-access",
+  "version": "1.0",
+  "created": "2025-01-25",
+  "contributor": "crux-team",
+  "source": "synthetic",
+  "description": "Storage account with public blob access enabled, allowing anonymous read access to blob data",
+  "expected_findings": [
+    {
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "resource_name_pattern": "stpublicaccess*",
+      "expected_labels": ["Storage_PublicAccess"],
+      "min_risk_score": 0.6,
+      "expected_risk_level": "HIGH",
+      "must_detect": true
+    }
+  ],
+  "false_positive_checks": [
+    {
+      "description": "Should NOT flag HTTPS (it's enabled)",
+      "unexpected_labels": ["Storage_NoHttps"]
+    },
+    {
+      "description": "Should NOT flag TLS (TLS1_2 is set)",
+      "unexpected_labels": ["Storage_WeakTLS"]
+    }
+  ],
+  "cis_references": ["3.7"],
+  "real_world_impact": "Public blob access allows anyone on the internet to read blob data without authentication. This has led to numerous data breaches including exposed customer PII, backup files, and credentials.",
+  "remediation": "Set allowBlobPublicAccess to false at the storage account level"
+}
