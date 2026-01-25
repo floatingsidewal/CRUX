@@ -5,6 +5,7 @@ Provides functionality for:
 - Submitting new samples with known issues
 - Validating scanner against test corpus
 - Managing and sanitizing templates
+- DLP validation for PII detection
 """
 
 from .submission import (
@@ -16,6 +17,14 @@ from .submission import (
 )
 from .validator import CorpusValidator, ValidationResult
 from .sanitizer import TemplateSanitizer
+from .dlp import (
+    TemplateDLPValidator,
+    DLPValidationResult,
+    DLPValidationLevel,
+    DLPFinding,
+    validate_template_dlp,
+    PRESIDIO_AVAILABLE,
+)
 
 __all__ = [
     "SampleSubmission",
@@ -26,4 +35,10 @@ __all__ = [
     "CorpusValidator",
     "ValidationResult",
     "TemplateSanitizer",
+    "TemplateDLPValidator",
+    "DLPValidationResult",
+    "DLPValidationLevel",
+    "DLPFinding",
+    "validate_template_dlp",
+    "PRESIDIO_AVAILABLE",
 ]
