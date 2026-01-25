@@ -82,6 +82,101 @@ ALLOWLIST_PATTERNS = [
     r"10\.0\.0\.[01]",  # Common example IPs
 ]
 
+# Azure endpoint patterns that ARE allowed (official Microsoft/Azure domains)
+AZURE_ALLOWED_ENDPOINTS = [
+    # Azure Storage
+    r"\.blob\.core\.windows\.net",
+    r"\.file\.core\.windows\.net",
+    r"\.queue\.core\.windows\.net",
+    r"\.table\.core\.windows\.net",
+    r"\.dfs\.core\.windows\.net",  # Data Lake
+    r"\.web\.core\.windows\.net",  # Static websites
+
+    # Azure Key Vault
+    r"\.vault\.azure\.net",
+    r"\.vaultcore\.azure\.net",
+    r"\.managedhsm\.azure\.net",
+
+    # Azure SQL & Cosmos DB
+    r"\.database\.windows\.net",
+    r"\.documents\.azure\.com",
+    r"\.mongo\.cosmos\.azure\.com",
+    r"\.cassandra\.cosmos\.azure\.com",
+    r"\.gremlin\.cosmos\.azure\.com",
+    r"\.table\.cosmos\.azure\.com",
+
+    # Azure Service Bus & Event Hubs
+    r"\.servicebus\.windows\.net",
+
+    # Azure App Service & Functions
+    r"\.azurewebsites\.net",
+    r"\.scm\.azurewebsites\.net",
+    r"\.azurefd\.net",  # Front Door
+    r"\.trafficmanager\.net",
+
+    # Azure Container Services
+    r"\.azurecr\.io",  # Container Registry
+    r"\.azmk8s\.io",   # AKS
+
+    # Azure Cognitive Services & AI
+    r"\.cognitiveservices\.azure\.com",
+    r"\.openai\.azure\.com",
+    r"\.search\.windows\.net",
+
+    # Azure Management & Identity
+    r"\.management\.azure\.com",
+    r"\.graph\.microsoft\.com",
+    r"\.login\.microsoftonline\.com",
+    r"\.microsoftonline\.com",
+    r"\.azure\.com",
+    r"\.microsoft\.com",
+
+    # Azure DevOps
+    r"\.visualstudio\.com",
+    r"\.dev\.azure\.com",
+
+    # Azure CDN & Media
+    r"\.azureedge\.net",
+    r"\.media\.azure\.net",
+
+    # Azure IoT
+    r"\.azure-devices\.net",
+    r"\.azure-devices-provisioning\.net",
+
+    # Azure SignalR & Notification Hubs
+    r"\.service\.signalr\.net",
+    r"\.servicebus\.windows\.net",
+
+    # Azure Redis
+    r"\.redis\.cache\.windows\.net",
+
+    # Azure API Management
+    r"\.azure-api\.net",
+
+    # Azure Data Factory & Synapse
+    r"\.datafactory\.azure\.net",
+    r"\.sql\.azuresynapse\.net",
+    r"\.dev\.azuresynapse\.net",
+
+    # Azure Purview/Microsoft Purview
+    r"\.purview\.azure\.com",
+
+    # Generic Azure/Microsoft patterns
+    r"\.cloudapp\.azure\.com",
+    r"\.cloudapp\.net",
+    r"\.windows\.net",
+    r"\.azure\.net",
+]
+
+# Non-Azure URL pattern for detection when azure_only_endpoints=True
+NON_AZURE_URL_PATTERN = {
+    "NON_AZURE_URL": {
+        "pattern": r"https?://(?!localhost)[a-zA-Z0-9][-a-zA-Z0-9]*(?:\.[a-zA-Z0-9][-a-zA-Z0-9]*)+(?::\d+)?(?:/[^\s'\"]*)?",
+        "score": 0.75,
+        "context": [],
+    },
+}
+
 # Entity types to detect
 DEFAULT_ENTITIES = [
     "PERSON",
@@ -127,6 +222,7 @@ class DLPFinding:
             "AZURE_SAS_TOKEN": "CRITICAL: Remove SAS token",
             "AZURE_CONNECTION_STRING": "CRITICAL: Remove connection string",
             "INTERNAL_DOMAIN": "Replace internal domain with example.com",
+            "NON_AZURE_URL": "Replace with Azure endpoint or remove non-Azure URL",
         }
         return recommendations.get(self.entity_type, "Review and remove if sensitive")
 
@@ -273,6 +369,10 @@ class TemplateDLPValidator:
 
         if not result.is_safe:
             print(result.print_report())
+
+    Azure-Only Mode:
+        validator = TemplateDLPValidator(azure_only_endpoints=True)
+        # Will flag any non-Azure URLs as potential data leaks
     """
 
     def __init__(
@@ -280,6 +380,8 @@ class TemplateDLPValidator:
         validation_level: DLPValidationLevel = DLPValidationLevel.MODERATE,
         custom_patterns: Optional[Dict[str, Dict]] = None,
         allowlist: Optional[List[str]] = None,
+        azure_only_endpoints: bool = False,
+        additional_allowed_domains: Optional[List[str]] = None,
     ):
         """
         Initialize the DLP validator.
@@ -288,9 +390,20 @@ class TemplateDLPValidator:
             validation_level: Strictness level for validation
             custom_patterns: Additional patterns to detect
             allowlist: Regex patterns to ignore (won't be flagged)
+            azure_only_endpoints: If True, flag any non-Azure/Microsoft URLs
+            additional_allowed_domains: Extra domains to allow (e.g., your CDN)
         """
         self.validation_level = validation_level
         self.allowlist = allowlist or ALLOWLIST_PATTERNS.copy()
+        self.azure_only_endpoints = azure_only_endpoints
+        self.additional_allowed_domains = additional_allowed_domains or []
+
+        # Build Azure endpoint allowlist
+        self.azure_allowlist = AZURE_ALLOWED_ENDPOINTS.copy()
+        for domain in self.additional_allowed_domains:
+            # Escape dots and add as pattern
+            escaped = domain.replace(".", r"\.")
+            self.azure_allowlist.append(escaped)
 
         if not PRESIDIO_AVAILABLE:
             logger.warning("Presidio not available, using regex-only mode")
@@ -411,6 +524,10 @@ class TemplateDLPValidator:
         # Always run regex patterns as backup/supplement
         findings.extend(self._regex_scan(content, get_line_number))
 
+        # Check for non-Azure URLs if azure_only_endpoints is enabled
+        if self.azure_only_endpoints:
+            findings.extend(self._scan_non_azure_urls(content, get_line_number))
+
         # Deduplicate findings (same text, overlapping positions)
         findings = self._deduplicate_findings(findings)
 
@@ -454,6 +571,53 @@ class TemplateDLPValidator:
             if re.search(pattern, text, re.IGNORECASE):
                 return True
         return False
+
+    def _is_azure_endpoint(self, url: str) -> bool:
+        """Check if URL is an allowed Azure/Microsoft endpoint."""
+        for pattern in self.azure_allowlist:
+            if re.search(pattern, url, re.IGNORECASE):
+                return True
+        return False
+
+    def _scan_non_azure_urls(self, content: str, get_line_number) -> List[DLPFinding]:
+        """
+        Scan for non-Azure URLs when azure_only_endpoints mode is enabled.
+
+        This flags any URL that doesn't match known Azure/Microsoft patterns.
+        """
+        findings = []
+
+        # URL pattern
+        url_pattern = NON_AZURE_URL_PATTERN["NON_AZURE_URL"]["pattern"]
+        score = NON_AZURE_URL_PATTERN["NON_AZURE_URL"]["score"]
+
+        for match in re.finditer(url_pattern, content, re.IGNORECASE):
+            url = match.group()
+
+            # Skip if it's in the general allowlist
+            if self._is_allowlisted(url):
+                continue
+
+            # Skip if it's an Azure endpoint
+            if self._is_azure_endpoint(url):
+                continue
+
+            # Skip localhost and common dev URLs
+            if re.search(r"localhost|127\.0\.0\.1|::1", url, re.IGNORECASE):
+                continue
+
+            finding = DLPFinding(
+                entity_type="NON_AZURE_URL",
+                text=url,
+                start=match.start(),
+                end=match.end(),
+                score=score,
+                line_number=get_line_number(match.start()),
+                recommendation="Replace with Azure endpoint or add to allowed domains",
+            )
+            findings.append(finding)
+
+        return findings
 
     def _deduplicate_findings(self, findings: List[DLPFinding]) -> List[DLPFinding]:
         """Remove duplicate findings (same text or overlapping positions)."""
@@ -556,6 +720,8 @@ def validate_template_dlp(
     template_path: str,
     validation_level: str = "moderate",
     output_path: Optional[str] = None,
+    azure_only_endpoints: bool = False,
+    additional_allowed_domains: Optional[List[str]] = None,
 ) -> DLPValidationResult:
     """
     Convenience function to validate a template file.
@@ -564,12 +730,18 @@ def validate_template_dlp(
         template_path: Path to template file
         validation_level: strict, moderate, or permissive
         output_path: Optional path to save report
+        azure_only_endpoints: If True, flag any non-Azure/Microsoft URLs
+        additional_allowed_domains: Extra domains to allow when azure_only_endpoints=True
 
     Returns:
         DLPValidationResult
     """
     level = DLPValidationLevel(validation_level.lower())
-    validator = TemplateDLPValidator(validation_level=level)
+    validator = TemplateDLPValidator(
+        validation_level=level,
+        azure_only_endpoints=azure_only_endpoints,
+        additional_allowed_domains=additional_allowed_domains,
+    )
 
     content = Path(template_path).read_text()
     result = validator.validate(content, filename=template_path)
@@ -579,3 +751,14 @@ def validate_template_dlp(
         Path(output_path).write_text(json.dumps(result.to_dict(), indent=2))
 
     return result
+
+
+# Export Azure endpoint patterns for reference/customization
+def get_azure_allowed_endpoints() -> List[str]:
+    """
+    Get the list of Azure endpoint patterns that are allowed.
+
+    Returns:
+        List of regex patterns for Azure/Microsoft endpoints
+    """
+    return AZURE_ALLOWED_ENDPOINTS.copy()

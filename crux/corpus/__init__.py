@@ -23,7 +23,9 @@ from .dlp import (
     DLPValidationLevel,
     DLPFinding,
     validate_template_dlp,
+    get_azure_allowed_endpoints,
     PRESIDIO_AVAILABLE,
+    AZURE_ALLOWED_ENDPOINTS,
 )
 
 __all__ = [
@@ -40,5 +42,7 @@ __all__ = [
     "DLPValidationLevel",
     "DLPFinding",
     "validate_template_dlp",
+    "get_azure_allowed_endpoints",
     "PRESIDIO_AVAILABLE",
+    "AZURE_ALLOWED_ENDPOINTS",
 ]
