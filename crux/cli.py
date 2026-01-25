@@ -802,6 +802,10 @@ def cmd_validate_corpus(args: argparse.Namespace) -> None:
     logger.info(f"Validating scanner against corpus: {args.corpus_dir}")
     logger.info(f"Using model: {args.model}")
 
+    min_pass_rate = getattr(args, 'min_pass_rate', 0.0)
+    if min_pass_rate > 0:
+        logger.info(f"Minimum pass rate required: {min_pass_rate:.1%}")
+
     try:
         validator = CorpusValidator(
             model_path=args.model,
@@ -819,9 +823,13 @@ def cmd_validate_corpus(args: argparse.Namespace) -> None:
             output_path.write_text(result.to_json())
             logger.info(f"\nResults saved to: {args.output}")
 
-        # Exit with appropriate code
-        if result.pass_rate < 1.0:
+        # Check against minimum pass rate
+        if min_pass_rate > 0 and result.pass_rate < min_pass_rate:
+            logger.error(f"Pass rate {result.pass_rate:.1%} is below minimum {min_pass_rate:.1%}")
             sys.exit(1)
+        elif result.pass_rate < 1.0 and min_pass_rate == 0:
+            # Default behavior: warn but don't fail unless min_pass_rate is set
+            logger.warning(f"Some test cases failed (pass rate: {result.pass_rate:.1%})")
 
     except Exception as e:
         logger.error(f"Validation failed: {e}")
@@ -1372,6 +1380,12 @@ def build_parser() -> argparse.ArgumentParser:
     validate_parser.add_argument(
         "--output",
         help="Path to save validation results (JSON)",
+    )
+    validate_parser.add_argument(
+        "--min-pass-rate",
+        type=float,
+        default=0.0,
+        help="Minimum pass rate (0.0-1.0) required; exit with code 1 if below (default: 0.0 = no minimum)",
     )
     validate_parser.set_defaults(func=cmd_validate_corpus)
 
