@@ -18,6 +18,7 @@ from .dataset.template_level_generator import (
 )
 from .mutations import ALL_MUTATIONS
 from .scan import TemplateScanner
+from .corpus import submit_sample, list_submissions, CorpusValidator, KNOWN_ISSUE_TYPES, SEVERITY_LEVELS
 
 # Configure logging
 logging.basicConfig(
@@ -724,6 +725,132 @@ def cmd_scan(args: argparse.Namespace) -> None:
     sys.exit(result.exit_code)
 
 
+def cmd_submit_sample(args: argparse.Namespace) -> None:
+    """Submit a sample template with known issues to the test corpus."""
+    logger.info(f"Submitting sample: {args.template}")
+
+    # Parse issue types
+    issue_types = [t.strip() for t in args.issue_types.split(",")]
+
+    # Parse CIS references
+    cis_refs = []
+    if args.cis_references:
+        cis_refs = [r.strip() for r in args.cis_references.split(",")]
+
+    try:
+        submission = submit_sample(
+            template_path=args.template,
+            issue_types=issue_types,
+            severity=args.severity,
+            description=args.description,
+            submitted_by=args.submitted_by,
+            cis_references=cis_refs,
+            environment=args.environment,
+            discovery_method=args.discovery_method,
+            anonymize=not args.no_anonymize,
+            corpus_dir=args.corpus_dir,
+        )
+
+        logger.info(f"\nSample submitted successfully!")
+        logger.info(f"  Submission ID: {submission.submission_id}")
+        logger.info(f"  Status: {submission.status}")
+        logger.info(f"  Template saved to: {submission.template_path}")
+        logger.info(f"  Anonymized: {submission.anonymized}")
+
+        logger.info("\nNext steps:")
+        logger.info(f"  1. Review submission: cat {args.corpus_dir}/submissions/{submission.submission_id}/submission.json")
+        logger.info(f"  2. List pending: crux list-submissions --status pending")
+        logger.info(f"  3. After review, submission will be merged into the test corpus")
+
+    except Exception as e:
+        logger.error(f"Submission failed: {e}")
+        sys.exit(1)
+
+
+def cmd_list_submissions(args: argparse.Namespace) -> None:
+    """List submissions in the test corpus."""
+    submissions = list_submissions(
+        corpus_dir=args.corpus_dir,
+        status=args.status,
+    )
+
+    if not submissions:
+        logger.info("No submissions found")
+        return
+
+    # Group by status
+    by_status = {}
+    for sub in submissions:
+        if sub.status not in by_status:
+            by_status[sub.status] = []
+        by_status[sub.status].append(sub)
+
+    for status in ["pending", "approved", "merged", "rejected"]:
+        if status in by_status:
+            print(f"\n{status.upper()} ({len(by_status[status])}):")
+            for sub in by_status[status]:
+                print(f"  [{sub.submission_id}]")
+                print(f"    Submitted: {sub.submitted_at[:10]} by {sub.submitted_by}")
+                print(f"    Issues: {', '.join(sub.issue_types)}")
+                print(f"    Severity: {sub.severity}")
+                if sub.review_notes:
+                    print(f"    Notes: {sub.review_notes[:50]}...")
+
+
+def cmd_validate_corpus(args: argparse.Namespace) -> None:
+    """Validate the scanner against the test corpus."""
+    logger.info(f"Validating scanner against corpus: {args.corpus_dir}")
+    logger.info(f"Using model: {args.model}")
+
+    try:
+        validator = CorpusValidator(
+            model_path=args.model,
+            rules_dir=args.rules if hasattr(args, 'rules') and args.rules else None,
+            corpus_dir=args.corpus_dir,
+        )
+
+        result = validator.validate()
+        result.print_report()
+
+        # Save results if requested
+        if args.output:
+            output_path = Path(args.output)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            output_path.write_text(result.to_json())
+            logger.info(f"\nResults saved to: {args.output}")
+
+        # Exit with appropriate code
+        if result.pass_rate < 1.0:
+            sys.exit(1)
+
+    except Exception as e:
+        logger.error(f"Validation failed: {e}")
+        sys.exit(1)
+
+
+def cmd_list_issue_types(args: argparse.Namespace) -> None:
+    """List known issue types for sample submission."""
+    print("\nKnown Issue Types for Sample Submission:\n")
+
+    # Group by category
+    categories = {}
+    for issue_type, description in KNOWN_ISSUE_TYPES.items():
+        if "_" in issue_type:
+            category = issue_type.split("_")[0]
+        else:
+            category = "General"
+        if category not in categories:
+            categories[category] = []
+        categories[category].append((issue_type, description))
+
+    for category in sorted(categories.keys()):
+        print(f"{category}:")
+        for issue_type, description in sorted(categories[category]):
+            print(f"  {issue_type}")
+            print(f"    {description}")
+        print()
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build the argument parser."""
     parser = argparse.ArgumentParser(
@@ -1146,6 +1273,114 @@ def build_parser() -> argparse.ArgumentParser:
         help="CI mode: shorthand for --output-format json --fail-threshold 0.7",
     )
     scan_parser.set_defaults(func=cmd_scan)
+
+    # submit-sample command
+    submit_parser = subparsers.add_parser(
+        "submit-sample",
+        help="Submit a template with known issues to the test corpus",
+    )
+    submit_parser.add_argument(
+        "--template",
+        required=True,
+        help="Path to Bicep or ARM JSON template with known issues",
+    )
+    submit_parser.add_argument(
+        "--issue-types",
+        required=True,
+        help="Comma-separated list of issue types (e.g., 'Storage_PublicAccess,Storage_NoHttps')",
+    )
+    submit_parser.add_argument(
+        "--severity",
+        choices=["critical", "high", "medium", "low"],
+        required=True,
+        help="Severity level of the issues",
+    )
+    submit_parser.add_argument(
+        "--description",
+        required=True,
+        help="Description of the issue(s) and context",
+    )
+    submit_parser.add_argument(
+        "--submitted-by",
+        default="anonymous",
+        help="Your email or identifier (default: anonymous)",
+    )
+    submit_parser.add_argument(
+        "--cis-references",
+        help="Comma-separated CIS benchmark references (e.g., '3.7,3.10')",
+    )
+    submit_parser.add_argument(
+        "--environment",
+        choices=["dev", "staging", "production", "unknown"],
+        default="unknown",
+        help="Environment where the issue was found",
+    )
+    submit_parser.add_argument(
+        "--discovery-method",
+        choices=["manual", "audit", "incident", "scan"],
+        default="manual",
+        help="How the issue was discovered",
+    )
+    submit_parser.add_argument(
+        "--no-anonymize",
+        action="store_true",
+        help="Do NOT anonymize the template (keep sensitive values)",
+    )
+    submit_parser.add_argument(
+        "--corpus-dir",
+        default="test-corpus",
+        help="Path to test corpus directory (default: test-corpus)",
+    )
+    submit_parser.set_defaults(func=cmd_submit_sample)
+
+    # list-submissions command
+    list_sub_parser = subparsers.add_parser(
+        "list-submissions",
+        help="List sample submissions in the test corpus",
+    )
+    list_sub_parser.add_argument(
+        "--status",
+        choices=["pending", "approved", "rejected", "merged"],
+        help="Filter by status",
+    )
+    list_sub_parser.add_argument(
+        "--corpus-dir",
+        default="test-corpus",
+        help="Path to test corpus directory (default: test-corpus)",
+    )
+    list_sub_parser.set_defaults(func=cmd_list_submissions)
+
+    # validate-corpus command
+    validate_parser = subparsers.add_parser(
+        "validate-corpus",
+        help="Validate scanner against test corpus",
+    )
+    validate_parser.add_argument(
+        "--model",
+        required=True,
+        help="Path to trained model (.pkl file)",
+    )
+    validate_parser.add_argument(
+        "--rules",
+        help="Directory containing YAML rule files (optional)",
+    )
+    validate_parser.add_argument(
+        "--corpus-dir",
+        default="test-corpus",
+        help="Path to test corpus directory (default: test-corpus)",
+    )
+    validate_parser.add_argument(
+        "--output",
+        help="Path to save validation results (JSON)",
+    )
+    validate_parser.set_defaults(func=cmd_validate_corpus)
+
+    # list-issue-types command
+    issue_types_parser = subparsers.add_parser(
+        "list-issue-types",
+        help="List known issue types for sample submission",
+    )
+    issue_types_parser.set_defaults(func=cmd_list_issue_types)
 
     return parser
 
