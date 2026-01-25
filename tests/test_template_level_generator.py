@@ -226,9 +226,43 @@ class TestMutationScenarios:
 
         # security_all should contain mutations from security_high and security_medium
         security_all = resolved['security_all']
-        assert 'storage_public_blob_access' in security_all or len(security_all) >= 0
-        # The actual mutations depend on what's available, but should be deduplicated
+        # Must have at least one mutation resolved
+        assert len(security_all) > 0, "security_all should resolve to non-empty mutation list"
+        # Should include mutations from both security_high and security_medium
+        # (only those that exist in sample_mutations will be resolved)
         assert len(security_all) == len(set(security_all)), "Duplicates in resolved scenarios"
+
+    def test_all_mutations_resolves_nested_references(self, rules_dir, sample_mutations):
+        """Test that all_mutations correctly resolves nested @ references."""
+        generator = TemplateLevelDatasetGenerator(
+            rules_dir=rules_dir,
+            mutations=sample_mutations
+        )
+        resolved = generator._resolved_scenarios
+
+        # all_mutations uses nested references: @security_all -> @security_high/@security_medium
+        all_mutations = resolved['all_mutations']
+
+        # Must have mutations resolved
+        assert len(all_mutations) > 0, "all_mutations should resolve to non-empty list"
+
+        # Should include mutations from all categories
+        # Verify the resolution includes expected mutation IDs
+        security_high_mutations = set(MUTATION_SCENARIOS['security_high']['mutations'])
+        security_medium_mutations = set(MUTATION_SCENARIOS['security_medium']['mutations'])
+
+        # All resolved mutations should come from the defined scenarios
+        expected_sources = (
+            security_high_mutations |
+            security_medium_mutations |
+            set(MUTATION_SCENARIOS['operational_high']['mutations']) |
+            set(MUTATION_SCENARIOS['operational_medium']['mutations']) |
+            set(MUTATION_SCENARIOS['reliability_high']['mutations']) |
+            set(MUTATION_SCENARIOS['reliability_medium']['mutations'])
+        )
+
+        for mutation_id in all_mutations:
+            assert mutation_id in expected_sources, f"Unexpected mutation {mutation_id} in all_mutations"
 
     def test_scenario_categories(self):
         """Test that scenarios have correct categories."""
@@ -554,6 +588,125 @@ class TestIntegration:
         assert '_mutation_applied' in mutated[0]
         assert len(mutated[0]['_mutation_applied']) == 1
         assert mutated[0]['_mutation_applied'][0]['mutation_id'] == 'storage_public_blob_access'
+
+
+class TestNestedReferenceResolution:
+    """Tests for nested @ reference resolution - regression tests for bug fix."""
+
+    def test_all_mutations_applies_storage_mutations(self, rules_dir):
+        """Test that all_mutations scenario actually applies storage mutations.
+
+        This is a regression test for the bug where all_mutations showed
+        identical results to baseline due to nested @ reference resolution failure.
+        """
+        generator = TemplateLevelDatasetGenerator(rules_dir=rules_dir)
+
+        resources = [
+            {
+                'type': 'Microsoft.Storage/storageAccounts',
+                'name': 'testaccount',
+                'properties': {
+                    'allowBlobPublicAccess': False,
+                    'supportsHttpsTrafficOnly': True,
+                    'minimumTlsVersion': 'TLS1_2'
+                }
+            }
+        ]
+
+        # Get resolved mutations for all_mutations
+        all_mutation_ids = generator._resolved_scenarios['all_mutations']
+
+        # Must include storage mutations (from security_high and security_medium)
+        storage_mutations = [m for m in all_mutation_ids if m.startswith('storage_')]
+        assert len(storage_mutations) > 0, "all_mutations should include storage mutations"
+
+        # Apply mutations
+        mutated = generator._apply_mutations(resources, all_mutation_ids)
+
+        # Verify mutations were actually applied
+        assert mutated[0]['properties']['allowBlobPublicAccess'] == True, \
+            "storage_public_blob_access mutation should set allowBlobPublicAccess to True"
+        assert mutated[0]['properties']['supportsHttpsTrafficOnly'] == False, \
+            "storage_http_allowed mutation should set supportsHttpsTrafficOnly to False"
+        assert mutated[0]['properties']['minimumTlsVersion'] == 'TLS1_0', \
+            "storage_weak_tls mutation should set minimumTlsVersion to TLS1_0"
+
+    def test_all_mutations_differs_from_baseline(self, rules_dir):
+        """Test that all_mutations produces different features than baseline.
+
+        This is the key regression test for the reported bug.
+        """
+        generator = TemplateLevelDatasetGenerator(rules_dir=rules_dir)
+
+        resources = [
+            {
+                'type': 'Microsoft.Storage/storageAccounts',
+                'name': 'testaccount',
+                'properties': {
+                    'allowBlobPublicAccess': False,
+                    'supportsHttpsTrafficOnly': True,
+                    'minimumTlsVersion': 'TLS1_2'
+                }
+            }
+        ]
+
+        # Get mutations for each scenario
+        baseline_ids = generator._resolved_scenarios['baseline']
+        all_mutation_ids = generator._resolved_scenarios['all_mutations']
+
+        # Baseline should have no mutations
+        assert len(baseline_ids) == 0, "baseline should have no mutations"
+        # all_mutations should have many mutations
+        assert len(all_mutation_ids) > 10, "all_mutations should have many mutations"
+
+        # Apply mutations
+        baseline_result = generator._apply_mutations(resources, baseline_ids)
+        all_mutations_result = generator._apply_mutations(resources, all_mutation_ids)
+
+        # Extract features
+        baseline_features = generator._extract_security_features(baseline_result)
+        all_mutations_features = generator._extract_security_features(all_mutations_result)
+
+        # Key test: features MUST differ
+        assert baseline_features['any_public_access'] == 0, \
+            "baseline should not have public access enabled"
+        assert all_mutations_features['any_public_access'] == 1, \
+            "all_mutations should have public access enabled"
+
+        assert baseline_features['any_http_allowed'] == 0, \
+            "baseline should not allow HTTP"
+        assert all_mutations_features['any_http_allowed'] == 1, \
+            "all_mutations should allow HTTP"
+
+        assert baseline_features['any_weak_tls'] == 0, \
+            "baseline should not have weak TLS"
+        assert all_mutations_features['any_weak_tls'] == 1, \
+            "all_mutations should have weak TLS"
+
+    def test_nested_references_resolve_completely(self, rules_dir):
+        """Test that deeply nested @ references resolve correctly."""
+        generator = TemplateLevelDatasetGenerator(rules_dir=rules_dir)
+
+        # all_mutations -> @security_all -> @security_high + @security_medium
+        all_mutations = generator._resolved_scenarios['all_mutations']
+
+        # Should include mutations from security_high
+        security_high_mutations = MUTATION_SCENARIOS['security_high']['mutations']
+        for m in security_high_mutations:
+            assert m in all_mutations, f"Missing {m} from security_high in all_mutations"
+
+        # Should include mutations from security_medium
+        security_medium_mutations = MUTATION_SCENARIOS['security_medium']['mutations']
+        for m in security_medium_mutations:
+            assert m in all_mutations, f"Missing {m} from security_medium in all_mutations"
+
+        # Should include operational mutations
+        for m in MUTATION_SCENARIOS['operational_high']['mutations']:
+            assert m in all_mutations, f"Missing {m} from operational_high in all_mutations"
+
+        # Should include reliability mutations
+        for m in MUTATION_SCENARIOS['reliability_high']['mutations']:
+            assert m in all_mutations, f"Missing {m} from reliability_high in all_mutations"
 
 
 class TestEdgeCases:

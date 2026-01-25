@@ -17,7 +17,7 @@ import pandas as pd
 from tqdm import tqdm
 
 # Import existing CRUX components
-from crux.templates.compiler import compile_bicep_to_arm
+from crux.templates.compiler import compile_bicep_file
 from crux.templates.extractor import extract_resources
 from crux.templates.graph import build_dependency_graph
 from crux.mutations.base import Mutation
@@ -320,7 +320,7 @@ class TemplateLevelDatasetGenerator:
     def _compile_template(self, template_path: str) -> Dict:
         """Compile Bicep to ARM or load ARM directly."""
         if template_path.endswith('.bicep'):
-            return compile_bicep_to_arm(template_path)
+            return compile_bicep_file(Path(template_path))
         else:
             with open(template_path) as f:
                 return json.load(f)
