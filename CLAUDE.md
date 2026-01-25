@@ -105,6 +105,13 @@ crux generate-dataset \
 # List available mutations and rules
 crux list-mutations
 crux list-rules
+
+# Scan a template for misconfigurations (Phase II)
+crux scan \
+  --template path/to/template.bicep \
+  --model models/my-model.pkl \
+  --rules rules/ \
+  --output-format text
 ```
 
 ## Architecture (Option D: Static Analysis)
@@ -137,6 +144,8 @@ crux/                          # Python package
 │   └── evaluator.py           # YAML rule evaluation
 ├── dataset/                   # Dataset generation
 │   └── generator.py           # End-to-end pipeline
+├── scan/                      # Inference/scanning (Phase II)
+│   └── scanner.py             # Template scanning with trained models
 └── cli.py                     # Command-line interface
 
 rules/                         # YAML rule definitions (data)
@@ -863,6 +872,275 @@ Key hyperparameters for GNNs:
 - Try different model architectures
 - Check that graphs have meaningful structure (not all disconnected nodes)
 
+## Scan Pipeline (Phase II - Inference)
+
+### Overview
+
+The Scan Pipeline enables inference on new Bicep/ARM templates using trained models. It combines rule-based detection with ML model predictions to provide comprehensive misconfiguration risk assessment, suitable for CI/CD integration.
+
+### Key Features
+
+- **Model-Agnostic**: Works with any trained CRUX model (Random Forest, XGBoost, Logistic Regression)
+- **Rule + ML Hybrid**: Combines deterministic rule violations with probabilistic ML predictions
+- **CI/CD Ready**: Configurable exit codes and thresholds for pipeline integration
+- **Multiple Output Formats**: JSON for automation, text for human review
+
+### Components
+
+#### 1. Template Scanner (`crux/scan/scanner.py`)
+
+Core scanning engine that:
+- Loads trained models and feature extractors
+- Compiles Bicep templates to ARM JSON
+- Extracts resources and generates features
+- Runs ML inference and rule evaluation
+- Computes risk scores and generates recommendations
+
+```python
+from crux.scan import TemplateScanner, ScanResult
+
+# Initialize scanner with trained model
+scanner = TemplateScanner(
+    model_path="models/my-model.pkl",
+    rules_dir="rules/",
+    fail_threshold=0.7,  # Optional: CI/CD threshold
+)
+
+# Scan a template
+result = scanner.scan("path/to/template.bicep")
+
+# Access results
+print(f"Risk Score: {result.overall_risk_score}")
+print(f"Risk Level: {result.overall_risk_level}")
+print(f"Resources at Risk: {result.resources_at_risk}/{result.total_resources}")
+
+# Output formats
+print(result.to_text())      # Human-readable report
+json_str = result.to_json()  # JSON for automation
+```
+
+#### 2. Scan Result (`crux/scan/scanner.py`)
+
+Structured result containing:
+- **Metadata**: Template path, scan timestamp, model info
+- **Summary**: Overall risk score/level, resource counts
+- **Findings**: Per-resource details with rule violations and recommendations
+- **CI/CD**: Exit code and threshold status
+
+```python
+@dataclass
+class ScanResult:
+    template_path: str
+    scan_timestamp: str
+    model_name: str
+    model_path: str
+    overall_risk_score: float      # 0.0 - 1.0
+    overall_risk_level: str        # LOW, MEDIUM, HIGH, CRITICAL
+    total_resources: int
+    resources_at_risk: int
+    findings: List[ResourceFinding]
+    rule_violations_count: int
+    unique_rule_violations: List[str]
+    exit_code: int                 # 0 = pass, 1 = threshold exceeded
+    threshold_exceeded: bool
+```
+
+#### 3. Risk Scoring
+
+Risk scores combine multiple signals:
+- **Rule Violations**: Deterministic matches from YAML rules
+- **ML Predictions**: Model confidence scores
+- **Severity Weighting**: High/critical findings weighted more heavily
+
+Risk levels:
+- **CRITICAL**: Score >= 0.8
+- **HIGH**: Score >= 0.6
+- **MEDIUM**: Score >= 0.4
+- **LOW**: Score < 0.4
+
+### CLI Commands
+
+#### Basic Scan
+
+```bash
+# Scan with text output (default)
+crux scan \
+  --template template.bicep \
+  --model models/my-model.pkl
+
+# Scan with JSON output
+crux scan \
+  --template template.bicep \
+  --model models/my-model.pkl \
+  --output-format json
+
+# Scan with both formats
+crux scan \
+  --template template.bicep \
+  --model models/my-model.pkl \
+  --output-format both
+
+# Save results to file
+crux scan \
+  --template template.bicep \
+  --model models/my-model.pkl \
+  --output results/scan-report.json \
+  --output-format json
+```
+
+#### With Rules
+
+```bash
+# Include rule-based detection
+crux scan \
+  --template template.bicep \
+  --model models/my-model.pkl \
+  --rules rules/
+```
+
+#### CI/CD Integration
+
+```bash
+# Set threshold - exit code 1 if risk score exceeds threshold
+crux scan \
+  --template template.bicep \
+  --model models/my-model.pkl \
+  --fail-threshold 0.7
+
+# CI mode shorthand (JSON output + 0.7 threshold)
+crux scan \
+  --template template.bicep \
+  --model models/my-model.pkl \
+  --ci
+
+# Use in GitHub Actions / Azure DevOps
+crux scan --template infra/main.bicep --model models/prod.pkl --ci
+if [ $? -ne 0 ]; then
+  echo "Security scan failed!"
+  exit 1
+fi
+```
+
+### Output Examples
+
+#### Text Output
+
+```
+================================================================================
+                         CRUX Template Scan Report
+================================================================================
+
+Template: /path/to/template.bicep
+Scanned: 2025-01-25 12:00:00
+Model: RandomForest (models/rf-baseline.pkl)
+
+SUMMARY
+--------------------------------------------------------------------------------
+Overall Risk Score: 0.75 (HIGH)
+Total Resources: 5
+Resources at Risk: 2
+Rule Violations: 3
+
+FINDINGS
+--------------------------------------------------------------------------------
+
+[HIGH] Microsoft.Storage/storageAccounts - teststorage123
+  Risk Score: 0.85
+  Rule Violations:
+    - Storage_PublicAccess
+    - Storage_NoHttps
+  Recommendations:
+    - Enable soft delete for blob data recovery
+    - Enforce HTTPS-only traffic
+    - Use TLS 1.2 or higher
+
+[MEDIUM] Microsoft.Network/virtualNetworks - testvnet
+  Risk Score: 0.45
+  Model Prediction: Potential misconfiguration detected
+  Recommendations:
+    - Enable DDoS protection for public-facing resources
+
+================================================================================
+```
+
+#### JSON Output
+
+```json
+{
+  "metadata": {
+    "template_path": "/path/to/template.bicep",
+    "scan_timestamp": "2025-01-25T12:00:00",
+    "model_name": "RandomForest",
+    "model_path": "models/rf-baseline.pkl"
+  },
+  "summary": {
+    "overall_risk_score": 0.75,
+    "overall_risk_level": "HIGH",
+    "total_resources": 5,
+    "resources_at_risk": 2,
+    "rule_violations_count": 3,
+    "unique_rule_violations": ["Storage_PublicAccess", "Storage_NoHttps"]
+  },
+  "findings": [
+    {
+      "resource_id": "/subscriptions/.../storageAccounts/teststorage123",
+      "resource_type": "Microsoft.Storage/storageAccounts",
+      "resource_name": "teststorage123",
+      "risk_score": 0.85,
+      "risk_level": "HIGH",
+      "rule_violations": ["Storage_PublicAccess", "Storage_NoHttps"],
+      "model_prediction": true,
+      "model_confidence": 0.9,
+      "recommendations": [
+        "Enable soft delete for blob data recovery",
+        "Enforce HTTPS-only traffic"
+      ]
+    }
+  ],
+  "ci_cd": {
+    "exit_code": 1,
+    "threshold_exceeded": true,
+    "threshold": 0.7
+  }
+}
+```
+
+### Workflow Example
+
+```bash
+# 1. Train a model (Phase I - already done)
+crux train-model \
+  --dataset dataset/exp-001 \
+  --model random-forest \
+  --output models \
+  --name rf-baseline
+
+# 2. Scan new templates (Phase II)
+crux scan \
+  --template new-infra/storage.bicep \
+  --model models/rf-baseline.pkl \
+  --rules rules/ \
+  --output-format both
+
+# 3. CI/CD pipeline usage
+crux scan \
+  --template new-infra/storage.bicep \
+  --model models/rf-baseline.pkl \
+  --ci
+```
+
+### Recommendations Engine
+
+The scanner generates context-aware recommendations based on:
+- Research findings (odds ratios from logistic regression analysis)
+- CIS Azure Benchmark references
+- Resource type-specific best practices
+
+Key findings from Phase I research inform recommendations:
+- **Encryption** (OR=0.07): Strong protective factor
+- **Versioning Disabled** (OR=10.89): High risk factor
+- **Network ACLs** (OR=0.28): Protective when enabled
+
 ## Development Workflow
 
 ### Adding New Mutations
@@ -970,9 +1248,19 @@ logger.error("Errors that prevent completion")
 
 ## Current Status
 
+### Phase I: Dataset Generation & Research (Complete)
+
 - ✅ **Milestone 0**: Repository restructuring, devcontainer with Claude Code CLI
 - ✅ **Milestone 1**: Core infrastructure (templates, mutations, rules, dataset generator, CLI)
 - ✅ **Milestone 2**: Large-scale dataset generation with dependency graphs
 - ✅ **Milestone 3**: ML validation (XGBoost, Random Forest baselines)
 - ✅ **Milestone 4**: GNN models (GCN, GAT, GraphSAGE for graph-aware detection)
+- ✅ **Research Paper**: Logistic regression analysis with 89.7% accuracy, ROC AUC 0.962
+
+### Phase II: Inference & Production (In Progress)
+
+- ✅ **Scan Module**: Template scanning with trained models (`crux/scan/`)
+- ✅ **CLI Integration**: `crux scan` command with JSON/text output
+- ✅ **CI/CD Support**: Configurable thresholds and exit codes
+- ✅ **Recommendations**: Context-aware security recommendations based on research findings
 

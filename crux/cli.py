@@ -17,6 +17,7 @@ from .dataset.template_level_generator import (
     MUTATION_SCENARIOS,
 )
 from .mutations import ALL_MUTATIONS
+from .scan import TemplateScanner
 
 # Configure logging
 logging.basicConfig(
@@ -655,6 +656,74 @@ def cmd_train_gnn(args: argparse.Namespace) -> None:
     logger.info(f"  Test F1 Micro: {test_metrics['f1_micro']:.3f}")
 
 
+def cmd_scan(args: argparse.Namespace) -> None:
+    """Scan a template for misconfigurations using a trained model."""
+    logger.info(f"Scanning template: {args.template}")
+
+    # Handle --ci shorthand flag
+    if hasattr(args, 'ci') and args.ci:
+        args.output_format = "json"
+        if args.fail_threshold is None:
+            args.fail_threshold = 0.7
+
+    # Parse fail threshold
+    fail_threshold = None
+    if args.fail_threshold is not None:
+        fail_threshold = args.fail_threshold
+        logger.info(f"CI/CD fail threshold: {fail_threshold}")
+
+    # Initialize scanner
+    try:
+        scanner = TemplateScanner(
+            model_path=args.model,
+            rules_dir=args.rules if hasattr(args, 'rules') and args.rules else None,
+            fail_threshold=fail_threshold,
+        )
+    except FileNotFoundError as e:
+        logger.error(str(e))
+        sys.exit(1)
+
+    # Scan template
+    try:
+        result = scanner.scan(args.template)
+    except Exception as e:
+        logger.error(f"Scan failed: {e}")
+        sys.exit(1)
+
+    # Output results
+    if args.output_format == "json":
+        print(result.to_json())
+    elif args.output_format == "text":
+        print(result.to_text())
+    else:
+        # Both formats
+        print(result.to_text())
+        print("\n" + "=" * 70)
+        print("JSON Output:")
+        print("=" * 70)
+        print(result.to_json())
+
+    # Save to file if requested
+    if args.output:
+        output_path = Path(args.output)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        if args.output.endswith('.json'):
+            with open(output_path, 'w') as f:
+                f.write(result.to_json())
+        else:
+            with open(output_path, 'w') as f:
+                f.write(result.to_text())
+
+        logger.info(f"Results saved to: {output_path}")
+
+    # Exit with appropriate code for CI/CD
+    if result.threshold_exceeded:
+        logger.warning(f"Risk threshold exceeded! (score: {result.overall_risk_score:.2%} >= {fail_threshold})")
+
+    sys.exit(result.exit_code)
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build the argument parser."""
     parser = argparse.ArgumentParser(
@@ -1036,6 +1105,47 @@ def build_parser() -> argparse.ArgumentParser:
         help="Early stopping patience in epochs (default: 10)",
     )
     gnn_parser.set_defaults(func=cmd_train_gnn)
+
+    # scan command
+    scan_parser = subparsers.add_parser(
+        "scan",
+        help="Scan a template for misconfigurations using a trained model",
+    )
+    scan_parser.add_argument(
+        "--template",
+        required=True,
+        help="Path to Bicep or ARM JSON template to scan",
+    )
+    scan_parser.add_argument(
+        "--model",
+        required=True,
+        help="Path to trained model (.pkl file)",
+    )
+    scan_parser.add_argument(
+        "--rules",
+        help="Directory containing YAML rule files for rule-based detection (optional)",
+    )
+    scan_parser.add_argument(
+        "--output",
+        help="Path to save scan results (JSON or text based on extension)",
+    )
+    scan_parser.add_argument(
+        "--output-format",
+        choices=["json", "text", "both"],
+        default="text",
+        help="Output format: 'json' for CI/CD integration, 'text' for human readable, 'both' (default: text)",
+    )
+    scan_parser.add_argument(
+        "--fail-threshold",
+        type=float,
+        help="Risk score threshold (0.0-1.0) to trigger non-zero exit code for CI/CD (default: never fail)",
+    )
+    scan_parser.add_argument(
+        "--ci",
+        action="store_true",
+        help="CI mode: shorthand for --output-format json --fail-threshold 0.7",
+    )
+    scan_parser.set_defaults(func=cmd_scan)
 
     return parser
 
